@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import QtQuick
 import QtQuick.Window
+import LoveLyrics.Backend
 
 Window {
     id: root
@@ -8,12 +9,38 @@ Window {
     height: 800
     visible: true
     color: "#101014"
-    title: Qt.application.displayName
+    title: Player.title ? Player.title + " — " + Qt.application.displayName : Qt.application.displayName
 
-    Text {
-        anchors.centerIn: parent
-        text: "Love Lyrics"
-        color: "#ffffff"
-        font.pixelSize: 48
+    property bool startOnDebugPage: false
+
+    // One clock update per rendered frame, so everything moves in step with vsync.
+    FrameAnimation {
+        running: Clock.playing
+        onTriggered: Clock.tick()
+    }
+
+    DebugPage {
+        anchors.fill: parent
+    }
+
+    Shortcut {
+        sequence: "Space"
+        onActivated: Player.playPause()
+    }
+    Shortcut {
+        sequence: "Right"
+        onActivated: Player.next()
+    }
+    Shortcut {
+        sequence: "Left"
+        onActivated: Player.previous()
+    }
+    Shortcut {
+        sequence: "["
+        onActivated: App.adjustTrackOffset(-100)
+    }
+    Shortcut {
+        sequence: "]"
+        onActivated: App.adjustTrackOffset(100)
     }
 }

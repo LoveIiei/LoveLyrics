@@ -2,21 +2,27 @@
 
 configure_file(app/AppInfo.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/AppInfo.h @ONLY)
 
-qt_add_executable(${APP_ID}
-    main.cpp
+# Backend: everything except main.cpp, so tests can link it.
+add_library(lovelyrics_core STATIC
+    app/AppController.cpp app/AppController.h
+    app/Settings.cpp app/Settings.h
+    lyrics/LrcParser.cpp lyrics/LrcParser.h
+    lyrics/LyricsCursor.cpp lyrics/LyricsCursor.h
+    lyrics/LyricsDocument.h
+    lyrics/LyricsLoader.cpp lyrics/LyricsLoader.h
+    lyrics/LyricsModel.cpp lyrics/LyricsModel.h
+    lyrics/TextDecoding.cpp lyrics/TextDecoding.h
+    media/CoverLoader.cpp media/CoverLoader.h
+    media/PaletteExtractor.cpp media/PaletteExtractor.h
+    media/TagReader.cpp media/TagReader.h
+    media/TrackResolver.cpp media/TrackResolver.h
+    mpris/MprisClient.cpp mpris/MprisClient.h
+    playback/PlaybackClock.cpp playback/PlaybackClock.h
 )
-
-set_target_properties(${APP_ID} PROPERTIES OUTPUT_NAME ${APP_ID})
-target_include_directories(${APP_ID} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_CURRENT_SOURCE_DIR})
-
-qt_add_qml_module(${APP_ID}
-    URI LoveLyrics
-    VERSION 1.0
-    QML_FILES
-        ../qml/Main.qml
-    NO_RESOURCE_TARGET_PATH
-)
-
-target_link_libraries(${APP_ID} PRIVATE Qt6::Quick Qt6::Qml Qt6::QuickControls2)
-
-install(TARGETS ${APP_ID} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+target_include_directories(lovelyrics_core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/generated)
+target_link_libraries(lovelyrics_core PUBLIC
+    Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::DBus Qt6::Concurrent
+    TagLib::tag)
+target_compile_options(lovelyrics_core PRIVATE -Wall -Wextra)

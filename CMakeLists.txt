@@ -27,6 +27,20 @@ include(GNUInstallDirs)
 
 add_subdirectory(src)
 
+# The app: main.cpp + the QML module. Defined here so QML resources live at qrc:/qml/...
+qt_add_executable(${APP_ID} src/main.cpp)
+qt_add_qml_module(${APP_ID}
+    URI LoveLyrics
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/Main.qml
+        qml/DebugPage.qml
+)
+target_link_libraries(${APP_ID} PRIVATE lovelyrics_core Qt6::QuickControls2)
+target_compile_options(${APP_ID} PRIVATE -Wall -Wextra)
+install(TARGETS ${APP_ID} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 include(CTest)
 if(BUILD_TESTING)
     find_package(Qt6 REQUIRED COMPONENTS Test)

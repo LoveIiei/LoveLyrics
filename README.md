@@ -24,7 +24,7 @@ sudo pacman -S --needed python-dbus python-gobject
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build
 ctest --test-dir build --output-on-failure
-./build/src/lovelyrics
+./build/lovelyrics
 ```
 
 Package locally: `cd packaging; makepkg -si`.
@@ -45,9 +45,9 @@ Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS
 `tools/fake_mpris.py` registers a fake player on the session bus:
 
 ```fish
-python3 tools/fake_mpris.py tests/data/demo.lrc
+python3 tools/fake_mpris.py            # plays tests/data/library
 # then in another terminal
-./build/src/lovelyrics
+./build/lovelyrics
 ```
 
 Type `help` in the fake player for commands (play/pause, seek, next, …).
