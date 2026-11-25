@@ -2,8 +2,10 @@
 #include "AppInfo.h"
 #include "app/AppController.h"
 #include "app/Settings.h"
+#include "mpris/MprisClient.h"
 
 #include <QCommandLineParser>
+#include <QFont>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -24,7 +26,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
     const QCommandLineOption playerOpt(
-        QStringLiteral("player"), QStringLiteral("MPRIS player to follow (default: strawberry). Saved."),
+        QStringLiteral("player"), QStringLiteral("MPRIS player to follow for this run (default: the saved setting, strawberry)."),
         QStringLiteral("name"));
     const QCommandLineOption debugOpt(QStringLiteral("debug"), QStringLiteral("Start on the debug page."));
     const QCommandLineOption grabOpt(QStringLiteral("grab"),
@@ -40,10 +42,20 @@ int main(int argc, char *argv[])
     parser.process(app);
 
     // Destroyed after the engine (declared first), since QML and the image provider use it.
-    Settings settings;
-    if (parser.isSet(playerOpt))
-        settings.setPlayerName(parser.value(playerOpt));
+    // LOVELYRICS_CONFIG=/path/file.conf uses another settings file (tests, dev runs).
+    const QString configOverride = qEnvironmentVariable("LOVELYRICS_CONFIG");
+    Settings settings(configOverride.isEmpty() ? Settings::defaultPath() : configOverride);
     AppController controller(&settings);
+    if (parser.isSet(playerOpt)) // this run only; the saved setting is left alone
+        controller.player()->setPlayerName(parser.value(playerOpt));
+
+    // Mixed CJK + Latin lines: when the chosen family lacks a glyph, try Noto Sans CJK SC
+    // before fontconfig's own fallback (which may pick the JP variant for Chinese text).
+    auto updateFontFallback = [&settings] {
+        QFont::insertSubstitutions(settings.fontFamily(), {QStringLiteral("Noto Sans CJK SC")});
+    };
+    updateFontFallback();
+    QObject::connect(&settings, &Settings::fontFamilyChanged, &app, updateFontFallback);
 
     QQmlApplicationEngine engine;
     controller.registerWithQml(&engine);

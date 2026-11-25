@@ -36,6 +36,35 @@ qt_add_qml_module(${APP_ID}
     QML_FILES
         qml/Main.qml
         qml/DebugPage.qml
+        qml/ControlsOverlay.qml
+        qml/background/Ambient.qml
+        qml/components/CrossfadeImage.qml
+        qml/components/IconButton.qml
+        qml/components/IdleScreen.qml
+        qml/components/InstrumentalDots.qml
+        qml/components/NoLyricsScreen.qml
+        qml/components/RoundedImage.qml
+        qml/components/Theme.qml
+        qml/components/Toast.qml
+        qml/components/TrackBadge.qml
+        qml/styles/registry.js
+        qml/styles/Flow/Style.qml
+    RESOURCES
+        qml/icons/play.svg
+        qml/icons/pause.svg
+        qml/icons/next.svg
+        qml/icons/prev.svg
+        qml/icons/fullscreen.svg
+        qml/icons/fullscreen-exit.svg
+        qml/icons/translate.svg
+        qml/icons/style.svg
+        qml/icons/settings.svg
+)
+qt_add_shaders(${APP_ID} "lovelyrics_shaders"
+    PREFIX "/"
+    FILES
+        shaders/grain.frag
+        shaders/gradient.frag
 )
 target_link_libraries(${APP_ID} PRIVATE lovelyrics_core Qt6::QuickControls2)
 target_compile_options(${APP_ID} PRIVATE -Wall -Wextra)

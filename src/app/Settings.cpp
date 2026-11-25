@@ -4,10 +4,11 @@
 #include "lyrics/LyricsLoader.h"
 
 #include <QCryptographicHash>
+#include <QStandardPaths>
 
 Settings::Settings(QObject *parent)
     : QObject(parent)
-    , m_s(QSettings::IniFormat, QSettings::UserScope, QStringLiteral("lovelyrics"), QStringLiteral("lovelyrics"))
+    , m_s(defaultPath(), QSettings::IniFormat)
 {
 }
 
@@ -15,6 +16,12 @@ Settings::Settings(const QString &iniPath, QObject *parent)
     : QObject(parent)
     , m_s(iniPath, QSettings::IniFormat)
 {
+}
+
+QString Settings::defaultPath()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)
+           + QStringLiteral("/lovelyrics/lovelyrics.conf");
 }
 
 QString Settings::playerName() const { return get<QString>("player/name", QStringLiteral("strawberry")); }

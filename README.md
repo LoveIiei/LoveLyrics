@@ -40,19 +40,51 @@ For each track (in this order, configurable):
 
 Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS.
 
+## Using it
+
+| Key | Action |
+|-----|--------|
+| `Space` | play / pause |
+| `←` / `→` | previous / next track |
+| `F`, `F11`, double-click | full screen on/off (`Esc` leaves) |
+| `[` / `]` | lyrics 0.1 s earlier / later for this track (saved per track), `\` resets |
+| `T` | translations on/off |
+| `C` | cover + title corner on/off |
+| `S` | next style |
+| `D` | debug page |
+
+Click a lyric line to jump to it. Moving the mouse shows the controls; they and the
+cursor hide after 2 s.
+
+Settings live in `~/.config/lovelyrics/lovelyrics.conf`. `lovelyrics --player NAME`
+follows another MPRIS player for one run.
+
 ## Testing without Strawberry
 
-`tools/fake_mpris.py` registers a fake player on the session bus:
+`tools/run_with_fake.sh` starts a private D-Bus session with the fake player
+(`tools/fake_mpris.py`, playing `tests/data/library`) and the app in it, so a running
+Strawberry is never touched and your real settings aren't used (`build/dev/test.conf`):
 
 ```fish
-python3 tools/fake_mpris.py            # plays tests/data/library
-# then in another terminal
+tools/run_with_fake.sh
+env FAKE_ARGS="--start 40" tools/run_with_fake.sh     # start 40 s in
+```
+
+It prints a FIFO path; `echo "s 30" > /tmp/tmp.XXXX` seeks the fake player (`p` play/pause,
+`n` next, `release`/`acquire` simulate the player quitting/starting, `jitter 40` adds
+noise to position reads; `help` lists all).
+
+Or run the fake player on your normal session bus (only while Strawberry is closed):
+
+```fish
+python3 tools/fake_mpris.py
 ./build/lovelyrics
 ```
 
-Type `help` in the fake player for commands (play/pause, seek, next, …).
-Use `--bus-name strawberry` (the default) to impersonate Strawberry, or another
-name together with `lovelyrics --player <name>`.
+Screenshots for development: `./build/lovelyrics --grab out.png --grab-after 3000`.
+Headless (offscreen) runs need `env QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl
+QT_QPA_PLATFORM=offscreen`, otherwise Qt Quick falls back to the software renderer,
+which can't draw shaders or blur.
 
 ## Hybrid graphics (Intel + NVIDIA)
 
@@ -66,3 +98,10 @@ env __NV_PRIME_RENDER_OFFLOAD=1 QSG_RHI_BACKEND=vulkan lovelyrics
 ```
 
 Frame timing: `env QSG_RENDER_TIMING=1 lovelyrics`.
+
+## Full screen on a chosen monitor (Wayland)
+
+The app remembers which screen it was on and goes full screen there. If KWin puts it
+on the wrong output anyway, add a window rule: *System Settings → Window Management →
+Window Rules → Add New*, match *Window class* `lovelyrics`, then set *Screen* (Force,
+the monitor number) and optionally *Fullscreen* (Apply Initially, Yes).

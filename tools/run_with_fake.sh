@@ -6,6 +6,8 @@
 set -eu
 here=$(cd "$(dirname "$0")/.." && pwd)
 export QT_FORCE_STDERR_LOGGING=1
+# Keep dev runs out of the real config.
+export LOVELYRICS_CONFIG="${LOVELYRICS_CONFIG:-$here/build/dev/test.conf}"
 exec dbus-run-session -- sh -c '
     here="$1"; shift
     fifo=$(mktemp -u); mkfifo "$fifo"; echo "fake player commands: echo CMD > $fifo" >&2

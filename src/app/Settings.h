@@ -30,9 +30,11 @@ class Settings : public QObject
     Q_PROPERTY(bool hideWhenPlayerQuits READ hideWhenPlayerQuits WRITE setHideWhenPlayerQuits NOTIFY hideWhenPlayerQuitsChanged)
 
 public:
-    explicit Settings(QObject *parent = nullptr);
-    // For tests: a settings file at a given path.
+    explicit Settings(QObject *parent = nullptr); // defaultPath()
     explicit Settings(const QString &iniPath, QObject *parent = nullptr);
+
+    // ~/.config/lovelyrics/lovelyrics.conf
+    static QString defaultPath();
 
     QString fileName() const { return m_s.fileName(); }
 
