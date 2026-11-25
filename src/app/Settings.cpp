@@ -72,6 +72,12 @@ void Settings::setWindowScreen(const QString &v) { set("window/screen", v, &Sett
 bool Settings::fullScreen() const { return get<bool>("window/fullScreen", false); }
 void Settings::setFullScreen(bool v) { set("window/fullScreen", v, &Settings::fullScreenChanged); }
 
+QString Settings::fullScreenScreen() const { return get<QString>("window/fullScreenScreen", QString()); }
+void Settings::setFullScreenScreen(const QString &v)
+{
+    set("window/fullScreenScreen", v, &Settings::fullScreenScreenChanged);
+}
+
 QString Settings::autostartMode() const { return get<QString>("autostart/mode", QStringLiteral("window")); }
 void Settings::setAutostartMode(const QString &v) { set("autostart/mode", v, &Settings::autostartModeChanged); }
 

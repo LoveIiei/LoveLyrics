@@ -12,6 +12,7 @@ Item {
     readonly property bool hovered: hover.hovered || seekMouse.pressed
     signal toggleFullScreen()
     signal nextStyle()
+    signal openSettings()
     signal offsetChanged()
 
     height: 150
@@ -174,6 +175,11 @@ Item {
                 icon: "style"
                 size: 44
                 onClicked: root.nextStyle()
+            }
+            IconButton {
+                icon: "settings"
+                size: 44
+                onClicked: root.openSettings()
             }
             IconButton {
                 icon: root.fullScreen ? "fullscreen-exit" : "fullscreen"

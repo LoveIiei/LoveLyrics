@@ -37,6 +37,7 @@ qt_add_qml_module(${APP_ID}
         qml/Main.qml
         qml/DebugPage.qml
         qml/ControlsOverlay.qml
+        qml/SettingsPage.qml
         qml/background/Ambient.qml
         qml/components/CrossfadeImage.qml
         qml/components/IconButton.qml
@@ -47,8 +48,12 @@ qt_add_qml_module(${APP_ID}
         qml/components/Theme.qml
         qml/components/Toast.qml
         qml/components/TrackBadge.qml
+        qml/components/wordlayout.js
         qml/styles/registry.js
         qml/styles/Flow/Style.qml
+        qml/styles/Kinetic/Style.qml
+        qml/styles/Stage/Style.qml
+        qml/styles/Still/Style.qml
     RESOURCES
         qml/icons/play.svg
         qml/icons/pause.svg

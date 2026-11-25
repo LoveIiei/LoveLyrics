@@ -10,6 +10,7 @@
 class Settings : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString fileName READ fileName CONSTANT)
     Q_PROPERTY(QString playerName READ playerName WRITE setPlayerName NOTIFY playerNameChanged)
     Q_PROPERTY(QStringList lyricSourceOrder READ lyricSourceOrder WRITE setLyricSourceOrder NOTIFY lyricSourceOrderChanged)
     Q_PROPERTY(int globalOffsetMs READ globalOffsetMs WRITE setGlobalOffsetMs NOTIFY globalOffsetMsChanged)
@@ -25,6 +26,8 @@ class Settings : public QObject
     Q_PROPERTY(QRect windowGeometry READ windowGeometry WRITE setWindowGeometry NOTIFY windowGeometryChanged)
     Q_PROPERTY(QString windowScreen READ windowScreen WRITE setWindowScreen NOTIFY windowScreenChanged)
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY fullScreenChanged)
+    // Monitor used for full screen ("" = the one the window is on).
+    Q_PROPERTY(QString fullScreenScreen READ fullScreenScreen WRITE setFullScreenScreen NOTIFY fullScreenScreenChanged)
     Q_PROPERTY(QString autostartMode READ autostartMode WRITE setAutostartMode NOTIFY autostartModeChanged)
     Q_PROPERTY(QString autostartScreen READ autostartScreen WRITE setAutostartScreen NOTIFY autostartScreenChanged)
     Q_PROPERTY(bool hideWhenPlayerQuits READ hideWhenPlayerQuits WRITE setHideWhenPlayerQuits NOTIFY hideWhenPlayerQuitsChanged)
@@ -68,6 +71,8 @@ public:
     void setWindowScreen(const QString &v);
     bool fullScreen() const;
     void setFullScreen(bool v);
+    QString fullScreenScreen() const;
+    void setFullScreenScreen(const QString &v);
     QString autostartMode() const; // "off", "window", "fullscreen"
     void setAutostartMode(const QString &v);
     QString autostartScreen() const;
@@ -101,6 +106,7 @@ signals:
     void windowGeometryChanged();
     void windowScreenChanged();
     void fullScreenChanged();
+    void fullScreenScreenChanged();
     void autostartModeChanged();
     void autostartScreenChanged();
     void hideWhenPlayerQuitsChanged();

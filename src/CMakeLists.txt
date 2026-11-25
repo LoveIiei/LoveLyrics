@@ -5,6 +5,7 @@ configure_file(app/AppInfo.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/AppInfo.h 
 # Backend: everything except main.cpp, so tests can link it.
 add_library(lovelyrics_core STATIC
     app/AppController.cpp app/AppController.h
+    app/FrameLimiter.cpp app/FrameLimiter.h
     app/Settings.cpp app/Settings.h
     lyrics/LrcParser.cpp lyrics/LrcParser.h
     lyrics/LyricsCursor.cpp lyrics/LyricsCursor.h

@@ -63,34 +63,82 @@ Window {
         Behavior on opacity { NumberAnimation { duration: 600 } }
     }
 
-    Loader {
-        id: styleLoader
+    // ---- styles: two slots, cross-faded on switch ----------------------------------------
+    // Unsynced lyrics always use the plain style; otherwise the chosen one.
+    readonly property string wantedStyle: Lyrics.hasLyrics && !Lyrics.synced ? Registry.plainStyle : Settings.style
+    property string shownStyle: ""
+    property int styleRevision: 0 // bumps when a tunable changes
+    Connections {
+        target: Settings
+        function onStyleValueChanged() { root.styleRevision++ }
+    }
+    // While lyrics are loading (hasLyrics briefly false) keep the current style, so a
+    // plain-lyrics track doesn't load the synced style first.
+    onWantedStyleChanged: if (Lyrics.hasLyrics || shownStyle === "") Qt.callLater(switchStyle)
+    Connections {
+        target: Lyrics
+        function onDocumentChanged() { if (Lyrics.hasLyrics) Qt.callLater(root.switchStyle) }
+    }
+    function switchStyle() {
+        if (wantedStyle === shownStyle)
+            return
+        const next = slotA.current ? slotB : slotA
+        const prev = slotA.current ? slotA : slotB
+        next.load(wantedStyle)
+        next.current = true
+        prev.current = false
+        shownStyle = wantedStyle
+    }
+
+    component StyleSlot: Loader {
+        id: slot
+        property bool current: false
+        property string styleName: ""
         anchors.fill: parent
-        opacity: root.showLyrics ? 1 : 0
+        opacity: current ? 1 : 0
         visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 500 } }
+        Behavior on opacity { NumberAnimation { duration: 700; easing.type: Easing.InOutQuad } }
+        // Unload once faded out: an invisible style costs nothing.
+        onOpacityChanged: if (!current && opacity === 0) setSource("")
 
         function load(name) {
             const entry = Registry.byName(name)
-            const settings = Object.assign({}, entry.defaults)
-            for (const key in entry.defaults)
-                settings[key] = Settings.styleValue(entry.name, key, entry.defaults[key])
+            styleName = entry.name
             setSource(Qt.resolvedUrl("styles/" + entry.file), {
                 lines: Lyrics,
                 cursor: Cursor,
                 positionMs: Clock.lyricsPositionMs,
                 theme: theme,
                 coverSource: Cover.source,
-                styleSettings: settings,
+                styleSettings: Registry.settingsFor(entry.name, Settings),
+                showTranslation: Settings.showTranslation,
+                showCoverInfo: Settings.showCoverInfo,
             })
         }
-        Component.onCompleted: load(Settings.style)
+
+        Binding { target: slot.item; property: "positionMs"; value: Clock.lyricsPositionMs; when: slot.item !== null }
+        Binding { target: slot.item; property: "coverSource"; value: Cover.source; when: slot.item !== null }
+        Binding { target: slot.item; property: "showTranslation"; value: Settings.showTranslation; when: slot.item !== null }
+        Binding { target: slot.item; property: "showCoverInfo"; value: Settings.showCoverInfo; when: slot.item !== null }
+        Binding { target: slot.item; property: "animate"; value: root.renderActive && slot.current; when: slot.item !== null }
+        Binding {
+            target: slot.item
+            property: "styleSettings"
+            when: slot.item !== null
+            value: { root.styleRevision; return Registry.settingsFor(slot.styleName, Settings) }
+        }
     }
-    Binding { target: styleLoader.item; property: "positionMs"; value: Clock.lyricsPositionMs; when: styleLoader.item !== null }
-    Binding { target: styleLoader.item; property: "coverSource"; value: Cover.source; when: styleLoader.item !== null }
-    Binding { target: styleLoader.item; property: "showTranslation"; value: Settings.showTranslation; when: styleLoader.item !== null }
-    Binding { target: styleLoader.item; property: "showCoverInfo"; value: Settings.showCoverInfo; when: styleLoader.item !== null }
-    Binding { target: styleLoader.item; property: "animate"; value: root.renderActive; when: styleLoader.item !== null }
+
+    Item {
+        id: styleHost
+        anchors.fill: parent
+        opacity: root.showLyrics ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 500 } }
+        StyleSlot { id: slotA }
+        StyleSlot { id: slotB }
+        Component.onCompleted: root.switchStyle()
+    }
 
     DebugPage {
         anchors.fill: parent
@@ -108,12 +156,22 @@ Window {
         scale: root.uiScale
         transformOrigin: Item.BottomLeft
         theme: theme
-        shown: root.controlsShown && Player.connected
+        shown: root.controlsShown
         fullScreen: root.isFullScreen
         onToggleFullScreen: root.toggleFullScreen()
         onNextStyle: root.nextStyle()
+        onOpenSettings: root.settingsOpen = true
         onOffsetChanged: root.showOffsetToast()
     }
+
+    SettingsPage {
+        id: settingsPage
+        anchors.fill: parent
+        theme: theme
+        open: root.settingsOpen
+        onCloseRequested: root.settingsOpen = false
+    }
+    property bool settingsOpen: false
 
     Toast {
         id: toast
@@ -158,6 +216,9 @@ Window {
             showNormal()
         else {
             saveGeometry()
+            for (const s of Qt.application.screens)
+                if (s.name === Settings.fullScreenScreen && s !== root.screen)
+                    root.screen = s
             showFullScreen()
         }
     }
@@ -165,8 +226,9 @@ Window {
     function nextStyle() {
         const name = Registry.next(Settings.style)
         Settings.style = name
-        styleLoader.load(name)
-        toast.show(qsTr("Style: %1").arg(name))
+        toast.show(Lyrics.hasLyrics && !Lyrics.synced
+                   ? qsTr("Style: %1 (this song's lyrics aren't synced, so: %2)").arg(name).arg(Registry.plainStyle)
+                   : qsTr("Style: %1").arg(name))
     }
 
     function showOffsetToast() {
@@ -199,29 +261,36 @@ Window {
         for (const s of Qt.application.screens)
             if (s.name === Settings.windowScreen)
                 root.screen = s
-        if (Settings.fullScreen)
+        if (Settings.fullScreen) {
+            for (const s of Qt.application.screens)
+                if (s.name === Settings.fullScreenScreen)
+                    root.screen = s
             showFullScreen()
+        }
     }
 
     // --- hotkeys -------------------------------------------------------------------------
-    Shortcut { sequence: "Space"; onActivated: Player.playPause() }
-    Shortcut { sequence: "Right"; onActivated: Player.next() }
-    Shortcut { sequence: "Left"; onActivated: Player.previous() }
-    Shortcut { sequence: "F"; onActivated: root.toggleFullScreen() }
+    Shortcut { sequence: "Space"; enabled: !root.settingsOpen; onActivated: Player.playPause() }
+    Shortcut { sequence: "Right"; enabled: !root.settingsOpen; onActivated: Player.next() }
+    Shortcut { sequence: "Left"; enabled: !root.settingsOpen; onActivated: Player.previous() }
+    Shortcut { sequence: "F"; enabled: !root.settingsOpen; onActivated: root.toggleFullScreen() }
     Shortcut { sequence: "F11"; onActivated: root.toggleFullScreen() }
-    Shortcut { sequence: "Escape"; enabled: root.isFullScreen; onActivated: root.showNormal() }
-    Shortcut { sequence: "S"; onActivated: root.nextStyle() }
-    Shortcut { sequence: "["; onActivated: { App.adjustTrackOffset(-100); root.showOffsetToast() } }
-    Shortcut { sequence: "]"; onActivated: { App.adjustTrackOffset(100); root.showOffsetToast() } }
-    Shortcut { sequence: "\\"; onActivated: { App.resetTrackOffset(); root.showOffsetToast() } }
+    Shortcut { sequence: "Escape"; enabled: root.settingsOpen; onActivated: root.settingsOpen = false }
+    Shortcut { sequence: "Escape"; enabled: root.isFullScreen && !root.settingsOpen; onActivated: root.showNormal() }
+    Shortcut { sequence: ","; onActivated: root.settingsOpen = !root.settingsOpen }
+    Shortcut { sequence: "S"; enabled: !root.settingsOpen; onActivated: root.nextStyle() }
+    Shortcut { sequence: "["; enabled: !root.settingsOpen; onActivated: { App.adjustTrackOffset(-100); root.showOffsetToast() } }
+    Shortcut { sequence: "]"; enabled: !root.settingsOpen; onActivated: { App.adjustTrackOffset(100); root.showOffsetToast() } }
+    Shortcut { sequence: "\\"; enabled: !root.settingsOpen; onActivated: { App.resetTrackOffset(); root.showOffsetToast() } }
     Shortcut {
         sequence: "T"
+        enabled: !root.settingsOpen
         onActivated: {
             Settings.showTranslation = !Settings.showTranslation
             toast.show(Settings.showTranslation ? qsTr("Translation on") : qsTr("Translation off"))
         }
     }
-    Shortcut { sequence: "C"; onActivated: Settings.showCoverInfo = !Settings.showCoverInfo }
-    Shortcut { sequence: "D"; onActivated: root.debugVisible = !root.debugVisible }
+    Shortcut { sequence: "C"; enabled: !root.settingsOpen; onActivated: Settings.showCoverInfo = !Settings.showCoverInfo }
+    Shortcut { sequence: "D"; enabled: !root.settingsOpen; onActivated: root.debugVisible = !root.debugVisible }
     Shortcut { sequences: [StandardKey.Quit]; onActivated: { root.saveGeometry(); Qt.quit() } }
 }

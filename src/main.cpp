@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #include "AppInfo.h"
 #include "app/AppController.h"
+#include "app/FrameLimiter.h"
 #include "app/Settings.h"
 #include "mpris/MprisClient.h"
 
@@ -36,7 +37,9 @@ int main(int argc, char *argv[])
                                           QStringLiteral("Dev: delay before --grab, in ms (default 3000)."),
                                           QStringLiteral("ms"), QStringLiteral("3000"));
     parser.addOption(playerOpt);
+    const QCommandLineOption settingsOpt(QStringLiteral("settings"), QStringLiteral("Open the settings panel."));
     parser.addOption(debugOpt);
+    parser.addOption(settingsOpt);
     parser.addOption(grabOpt);
     parser.addOption(grabAfterOpt);
     parser.process(app);
@@ -59,10 +62,20 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     controller.registerWithQml(&engine);
-    engine.setInitialProperties({{QStringLiteral("startOnDebugPage"), parser.isSet(debugOpt)}});
+    engine.setInitialProperties({{QStringLiteral("startOnDebugPage"), parser.isSet(debugOpt)},
+                                 {QStringLiteral("settingsOpen"), parser.isSet(settingsOpt)}});
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
     engine.loadFromModule("LoveLyrics", "Main");
+
+    auto *window = engine.rootObjects().isEmpty() ? nullptr : qobject_cast<QQuickWindow *>(engine.rootObjects().first());
+    if (window) {
+        auto *limiter = new FrameLimiter(window, &app);
+        limiter->setCap(settings.fpsCap());
+        QObject::connect(&settings, &Settings::fpsCapChanged, limiter, [limiter, &settings] {
+            limiter->setCap(settings.fpsCap());
+        });
+    }
 
     if (parser.isSet(grabOpt)) {
         const QString file = parser.value(grabOpt);

@@ -39,6 +39,7 @@ class MprisClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString playerName READ playerName WRITE setPlayerName NOTIFY playerNameChanged)
+    Q_PROPERTY(QString serviceName READ serviceName NOTIFY playerNameChanged)
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
     Q_PROPERTY(PlaybackStatus status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString identity READ identity NOTIFY connectedChanged)

@@ -51,12 +51,29 @@ Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS
 | `T` | translations on/off |
 | `C` | cover + title corner on/off |
 | `S` | next style |
+| `,` | settings (`Esc` closes) |
 | `D` | debug page |
 
 Click a lyric line to jump to it. Moving the mouse shows the controls; they and the
 cursor hide after 2 s.
 
-Settings live in `~/.config/lovelyrics/lovelyrics.conf`. `lovelyrics --player NAME`
+### Styles
+
+- **Flow** — scrolling lyrics; the active line is large and sharp, the others dim and
+  blur with distance, and the list moves like a wave.
+- **Kinetic** — one line at a time, very large, in a layout that changes per line; words
+  arrive on their timestamps (estimated when the file has none).
+- **Stage** — large tilting cover (follows the mouse, drifts when idle) with a
+  reflection and progress line; previous / current / next line beside it.
+- **Still** — calm centred column. Used automatically for lyrics without timestamps;
+  scroll by hand to look around (auto-scroll resumes after 5 s).
+
+Each style has its own tunables in the settings panel (gear button or `,`).
+
+Settings live in `~/.config/lovelyrics/lovelyrics.conf`; the settings panel covers
+the player name, where to look for lyrics first, offsets, styles, fonts, background,
+the monitor used for full screen and a frame-rate cap (60/120 fps, to save battery on
+the 240 Hz panel). `lovelyrics --player NAME`
 follows another MPRIS player for one run.
 
 ## Testing without Strawberry

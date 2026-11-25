@@ -15,6 +15,7 @@ lovelyrics_add_test(tst_textdecoding)
 lovelyrics_add_test(tst_clock)
 lovelyrics_add_test(tst_cursor)
 lovelyrics_add_test(tst_media)
+lovelyrics_add_test(tst_settings)
 
 # Integration: fake MPRIS player on a private session bus.
 lovelyrics_add_test(tst_mpris)
