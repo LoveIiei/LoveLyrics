@@ -87,6 +87,9 @@ int main(int argc, char *argv[])
 
     WindowManager windows(&controller, &settings,
                           {.debugPage = parser.isSet(debugOpt), .settingsOpen = parser.isSet(settingsOpt)});
+    // Nothing on screen yet: don't load media or poll the position until the window shows.
+    controller.setViewActive(false);
+    QObject::connect(&windows, &WindowManager::visibleChanged, &controller, &AppController::setViewActive);
     AutostartController autostart(controller.player(), &windows, &settings, resident);
     qmlRegisterSingletonInstance("LoveLyrics.Backend", 1, 0, "Autostart", &autostart);
 

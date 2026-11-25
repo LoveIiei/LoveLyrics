@@ -321,9 +321,19 @@ void MprisClient::onSeeked(qlonglong positionUs)
     emit positionSynced(positionUs / 1000, true);
 }
 
+void MprisClient::setPositionTracking(bool enabled)
+{
+    if (m_positionTracking == enabled)
+        return;
+    m_positionTracking = enabled;
+    updatePolling();
+    if (enabled)
+        requestPosition(true);
+}
+
 void MprisClient::requestPosition(bool snap)
 {
-    if (!m_connected)
+    if (!m_connected || !m_positionTracking)
         return;
     QDBusMessage msg = QDBusMessage::createMethodCall(m_service, MprisPath, PropsIface, QStringLiteral("Get"));
     msg << PlayerIface << QStringLiteral("Position");
@@ -345,7 +355,7 @@ void MprisClient::requestPosition(bool snap)
 
 void MprisClient::updatePolling()
 {
-    if (m_connected && m_status == Playing)
+    if (m_connected && m_status == Playing && m_positionTracking)
         m_pollTimer.start();
     else
         m_pollTimer.stop();

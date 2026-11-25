@@ -56,6 +56,7 @@ bool WindowManager::create()
     connect(m_settings, &Settings::fpsCapChanged, m_limiter, [this] { m_limiter->setCap(m_settings->fpsCap()); });
 
     connect(m_window, &QWindow::visibleChanged, this, [this](bool visible) {
+        emit visibleChanged(visible);
         if (!visible && !m_programmaticHide) {
             qCInfo(lcWindow) << "Window hidden by the user";
             emit userHid();

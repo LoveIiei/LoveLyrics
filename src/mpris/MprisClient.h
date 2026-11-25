@@ -88,6 +88,12 @@ public:
     bool canGoNext() const { return m_canGoNext; }
     bool canGoPrevious() const { return m_canGoPrevious; }
 
+    // Position reads (on changes and every 2 s while playing) are only needed while
+    // something shows the position. Off: no periodic wakeups at all; turning it back on
+    // reads the position right away.
+    void setPositionTracking(bool enabled);
+    bool positionTracking() const { return m_positionTracking; }
+
     static TrackInfo parseMetadata(const QVariantMap &metadata);
     static PlaybackStatus parseStatus(const QString &status);
 
@@ -134,6 +140,7 @@ private:
     QString m_playerName;
     QString m_service;
     bool m_subscribed = false;
+    bool m_positionTracking = true;
 
     bool m_connected = false;
     QString m_identity;

@@ -51,7 +51,9 @@ AppController::AppController(Settings *settings, QObject *parent)
     // Track -> lyrics, cover
     connect(m_player, &MprisClient::trackChanged, this, &AppController::onTrackChanged);
     connect(m_player, &MprisClient::artUrlChanged, this, [this](const QString &) {
-        if (!m_player->track().isEmpty())
+        if (!m_viewActive)
+            m_mediaPending = true;
+        else if (!m_player->track().isEmpty())
             m_cover->load(m_player->track()); // art often arrives a moment after the track
     });
     connect(m_loader, &LyricsLoader::loaded, m_lyrics, &LyricsModel::setDocument);
@@ -84,11 +86,35 @@ void AppController::onTrackChanged(const TrackInfo &track)
     emit trackChanged();
 
     if (track.isEmpty()) {
+        m_mediaPending = false;
         m_cover->clear();
         return;
     }
+    if (!m_viewActive) {
+        m_mediaPending = true; // loaded when the window shows
+        return;
+    }
+    loadTrackMedia();
+}
+
+void AppController::loadTrackMedia()
+{
+    m_mediaPending = false;
+    const TrackInfo &track = m_player->track();
+    if (track.isEmpty())
+        return;
     m_loader->load(track);
     m_cover->load(track);
+}
+
+void AppController::setViewActive(bool active)
+{
+    if (m_viewActive == active)
+        return;
+    m_viewActive = active;
+    m_player->setPositionTracking(active);
+    if (active && m_mediaPending)
+        loadTrackMedia();
 }
 
 void AppController::adjustTrackOffset(int deltaMs)

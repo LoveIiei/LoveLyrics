@@ -44,6 +44,8 @@ signals:
     void windowCreated(QQuickWindow *window);
     // The user closed/hid the window.
     void userHid();
+    // The window became visible / hidden (for any reason).
+    void visibleChanged(bool visible);
 
 private:
     bool create();

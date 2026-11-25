@@ -44,6 +44,12 @@ public:
     // under "import LoveLyrics.Backend" and the image://cover provider.
     void registerWithQml(QQmlEngine *engine);
 
+    // Whether anything is on screen. While inactive (background mode, window hidden) the
+    // track's lyrics / cover / palette are not loaded and the player isn't asked for its
+    // position; becoming active catches up with the current track.
+    void setViewActive(bool active);
+    bool viewActive() const { return m_viewActive; }
+
     // Lyric offset for the current track (saved per track). + shows lyrics later.
     Q_INVOKABLE void adjustTrackOffset(int deltaMs);
     Q_INVOKABLE void resetTrackOffset();
@@ -54,6 +60,7 @@ signals:
 
 private:
     void onTrackChanged(const TrackInfo &track);
+    void loadTrackMedia();
 
     Settings *m_settings;
     MprisClient *m_player;
@@ -63,6 +70,9 @@ private:
     LyricsCursor *m_cursor;
     Palette *m_palette;
     CoverLoader *m_cover;
+
+    bool m_viewActive = true;
+    bool m_mediaPending = false; // track changed while inactive
     QString m_trackKey;
     QString m_localPath;
 };
