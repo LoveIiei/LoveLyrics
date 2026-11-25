@@ -13,6 +13,7 @@ Item {
     signal toggleFullScreen()
     signal nextStyle()
     signal openSettings()
+    signal openCard()
     signal offsetChanged()
 
     height: 150
@@ -175,6 +176,12 @@ Item {
                 icon: "style"
                 size: 44
                 onClicked: root.nextStyle()
+            }
+            IconButton {
+                icon: "card"
+                size: 44
+                visible: Lyrics.hasLyrics
+                onClicked: root.openCard()
             }
             IconButton {
                 icon: "settings"

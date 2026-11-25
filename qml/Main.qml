@@ -161,6 +161,7 @@ Window {
         onToggleFullScreen: root.toggleFullScreen()
         onNextStyle: root.nextStyle()
         onOpenSettings: root.settingsOpen = true
+        onOpenCard: root.cardOpen = true
         onOffsetChanged: root.showOffsetToast()
     }
 
@@ -172,6 +173,17 @@ Window {
         onCloseRequested: root.settingsOpen = false
     }
     property bool settingsOpen: false
+
+    CardEditor {
+        anchors.fill: parent
+        theme: theme
+        open: root.cardOpen
+        onCloseRequested: root.cardOpen = false
+        onMessage: (text) => toast.show(text)
+    }
+    property bool cardOpen: false
+    // Panels with text fields: single-key shortcuts must not fire while one is open.
+    readonly property bool panelOpen: settingsOpen || cardOpen
 
     Toast {
         id: toast
@@ -279,27 +291,29 @@ Window {
     }
 
     // --- hotkeys -------------------------------------------------------------------------
-    Shortcut { sequence: "Space"; enabled: !root.settingsOpen; onActivated: Player.playPause() }
-    Shortcut { sequence: "Right"; enabled: !root.settingsOpen; onActivated: Player.next() }
-    Shortcut { sequence: "Left"; enabled: !root.settingsOpen; onActivated: Player.previous() }
-    Shortcut { sequence: "F"; enabled: !root.settingsOpen; onActivated: root.toggleFullScreen() }
+    Shortcut { sequence: "Space"; enabled: !root.panelOpen; onActivated: Player.playPause() }
+    Shortcut { sequence: "Right"; enabled: !root.panelOpen; onActivated: Player.next() }
+    Shortcut { sequence: "Left"; enabled: !root.panelOpen; onActivated: Player.previous() }
+    Shortcut { sequence: "F"; enabled: !root.panelOpen; onActivated: root.toggleFullScreen() }
     Shortcut { sequence: "F11"; onActivated: root.toggleFullScreen() }
-    Shortcut { sequence: "Escape"; enabled: root.settingsOpen; onActivated: root.settingsOpen = false }
-    Shortcut { sequence: "Escape"; enabled: root.isFullScreen && !root.settingsOpen; onActivated: root.showNormal() }
-    Shortcut { sequence: ","; onActivated: root.settingsOpen = !root.settingsOpen }
-    Shortcut { sequence: "S"; enabled: !root.settingsOpen; onActivated: root.nextStyle() }
-    Shortcut { sequence: "["; enabled: !root.settingsOpen; onActivated: { App.adjustTrackOffset(-100); root.showOffsetToast() } }
-    Shortcut { sequence: "]"; enabled: !root.settingsOpen; onActivated: { App.adjustTrackOffset(100); root.showOffsetToast() } }
-    Shortcut { sequence: "\\"; enabled: !root.settingsOpen; onActivated: { App.resetTrackOffset(); root.showOffsetToast() } }
+    Shortcut { sequence: "Escape"; enabled: root.cardOpen; onActivated: root.cardOpen = false }
+    Shortcut { sequence: "Escape"; enabled: root.settingsOpen && !root.cardOpen; onActivated: root.settingsOpen = false }
+    Shortcut { sequence: "Escape"; enabled: root.isFullScreen && !root.panelOpen; onActivated: root.showNormal() }
+    Shortcut { sequence: "E"; enabled: !root.panelOpen && Lyrics.hasLyrics; onActivated: root.cardOpen = true }
+    Shortcut { sequence: ","; enabled: !root.cardOpen; onActivated: root.settingsOpen = !root.settingsOpen }
+    Shortcut { sequence: "S"; enabled: !root.panelOpen; onActivated: root.nextStyle() }
+    Shortcut { sequence: "["; enabled: !root.panelOpen; onActivated: { App.adjustTrackOffset(-100); root.showOffsetToast() } }
+    Shortcut { sequence: "]"; enabled: !root.panelOpen; onActivated: { App.adjustTrackOffset(100); root.showOffsetToast() } }
+    Shortcut { sequence: "\\"; enabled: !root.panelOpen; onActivated: { App.resetTrackOffset(); root.showOffsetToast() } }
     Shortcut {
         sequence: "T"
-        enabled: !root.settingsOpen
+        enabled: !root.panelOpen
         onActivated: {
             Settings.showTranslation = !Settings.showTranslation
             toast.show(Settings.showTranslation ? qsTr("Translation on") : qsTr("Translation off"))
         }
     }
-    Shortcut { sequence: "C"; enabled: !root.settingsOpen; onActivated: Settings.showCoverInfo = !Settings.showCoverInfo }
-    Shortcut { sequence: "D"; enabled: !root.settingsOpen; onActivated: root.debugVisible = !root.debugVisible }
+    Shortcut { sequence: "C"; enabled: !root.panelOpen; onActivated: Settings.showCoverInfo = !Settings.showCoverInfo }
+    Shortcut { sequence: "D"; enabled: !root.panelOpen; onActivated: root.debugVisible = !root.debugVisible }
     Shortcut { sequences: [StandardKey.Quit]; onActivated: { root.saveGeometry(); Qt.quit() } }
 }

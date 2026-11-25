@@ -39,7 +39,8 @@ bool WindowManager::create()
     m_engine = std::make_unique<QQmlApplicationEngine>();
     m_controller->registerWithQml(m_engine.get());
     m_engine->setInitialProperties({{QStringLiteral("startOnDebugPage"), m_options.debugPage},
-                                    {QStringLiteral("settingsOpen"), m_options.settingsOpen}});
+                                    {QStringLiteral("settingsOpen"), m_options.settingsOpen},
+                                    {QStringLiteral("cardOpen"), m_options.cardOpen}});
     QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreationFailed, qApp,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
     m_engine->loadFromModule("LoveLyrics", "Main");

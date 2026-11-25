@@ -12,6 +12,7 @@ class LyricsModel;
 class LyricsCursor;
 class CoverLoader;
 class Palette;
+class CardController;
 struct TrackInfo;
 
 // Owns the backend objects and connects them:
@@ -36,6 +37,7 @@ public:
     LyricsCursor *cursor() const { return m_cursor; }
     CoverLoader *cover() const { return m_cover; }
     Palette *palette() const { return m_palette; }
+    CardController *cards() const { return m_cards; }
 
     QString trackKey() const { return m_trackKey; }
     QString localPath() const { return m_localPath; }
@@ -70,6 +72,7 @@ private:
     LyricsCursor *m_cursor;
     Palette *m_palette;
     CoverLoader *m_cover;
+    CardController *m_cards;
 
     bool m_viewActive = true;
     bool m_mediaPending = false; // track changed while inactive

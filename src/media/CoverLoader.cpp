@@ -173,6 +173,14 @@ void CoverLoader::apply(const Result &result)
     emit changed();
 }
 
+QImage CoverLoader::currentImage() const
+{
+    if (!m_hasCover)
+        return {};
+    QMutexLocker lock(&m_mutex);
+    return m_images.value(QStringLiteral("%1/full").arg(m_serial));
+}
+
 QImage CoverLoader::image(const QString &id) const
 {
     QMutexLocker lock(&m_mutex);

@@ -39,13 +39,14 @@ int main(int argc, char *argv[])
         QStringLiteral("name"));
     const QCommandLineOption debugOpt(QStringLiteral("debug"), QStringLiteral("Start on the debug page."));
     const QCommandLineOption settingsOpt(QStringLiteral("settings"), QStringLiteral("Open the settings panel."));
+    const QCommandLineOption cardOpt(QStringLiteral("card"), QStringLiteral("Open the lyric card editor."));
     const QCommandLineOption grabOpt(QStringLiteral("grab"),
                                      QStringLiteral("Dev: save a screenshot of the window to <file> and quit."),
                                      QStringLiteral("file"));
     const QCommandLineOption grabAfterOpt(QStringLiteral("grab-after"),
                                           QStringLiteral("Dev: delay before --grab, in ms (default 3000)."),
                                           QStringLiteral("ms"), QStringLiteral("3000"));
-    parser.addOptions({backgroundOpt, quitOpt, playerOpt, debugOpt, settingsOpt, grabOpt, grabAfterOpt});
+    parser.addOptions({backgroundOpt, quitOpt, playerOpt, debugOpt, settingsOpt, cardOpt, grabOpt, grabAfterOpt});
     parser.process(app);
 
     // ---- one instance per session -------------------------------------------------------
@@ -86,7 +87,8 @@ int main(int argc, char *argv[])
     QObject::connect(&settings, &Settings::fontFamilyChanged, &app, updateFontFallback);
 
     WindowManager windows(&controller, &settings,
-                          {.debugPage = parser.isSet(debugOpt), .settingsOpen = parser.isSet(settingsOpt)});
+                          {.debugPage = parser.isSet(debugOpt), .settingsOpen = parser.isSet(settingsOpt),
+                           .cardOpen = parser.isSet(cardOpt)});
     // Nothing on screen yet: don't load media or poll the position until the window shows.
     controller.setViewActive(false);
     QObject::connect(&windows, &WindowManager::visibleChanged, &controller, &AppController::setViewActive);

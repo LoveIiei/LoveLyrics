@@ -38,6 +38,7 @@ qt_add_qml_module(${APP_ID}
         qml/DebugPage.qml
         qml/ControlsOverlay.qml
         qml/SettingsPage.qml
+        qml/CardEditor.qml
         qml/background/Ambient.qml
         qml/components/CrossfadeImage.qml
         qml/components/IconButton.qml
@@ -64,6 +65,7 @@ qt_add_qml_module(${APP_ID}
         qml/icons/translate.svg
         qml/icons/style.svg
         qml/icons/settings.svg
+        qml/icons/card.svg
 )
 qt_add_shaders(${APP_ID} "lovelyrics_shaders"
     PREFIX "/"

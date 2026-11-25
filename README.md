@@ -52,6 +52,7 @@ Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS
 | `C` | cover + title corner on/off |
 | `S` | next style |
 | `,` | settings (`Esc` closes) |
+| `E` | make a lyric card |
 | `D` | debug page |
 
 Click a lyric line to jump to it. Moving the mouse shows the controls; they and the
@@ -75,6 +76,17 @@ the player name, where to look for lyrics first, offsets, styles, fonts, backgro
 the monitor used for full screen and a frame-rate cap (60/120 fps, to save battery on
 the 240 Hz panel). `lovelyrics --player NAME`
 follows another MPRIS player for one run.
+
+### Lyric cards
+
+`E` (or the card button in the controls) opens a card editor for the current song: pick
+lines (★ highlights one; you can also click a line on the preview), a template (Compact,
+Classic, Immersive, Depth, Whitespace), a size (long, 4:5, 9:16, 1:1), colours taken
+from the cover (faithful / soft / vivid / mono, light / dark), fonts and extras (date,
+progress bar, a note). *Save PNG* writes 1080 or 2160 px wide images to
+`~/Pictures/Love Lyrics/`; *Copy* puts the image on the clipboard. Templates and colour
+logic are ported from [Lyrics 4U](https://github.com/spacedge/lyric-card-generator)
+(AGPL-3.0).
 
 ### Starting with Strawberry
 

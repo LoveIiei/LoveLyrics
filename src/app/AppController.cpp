@@ -2,6 +2,7 @@
 #include "AppController.h"
 
 #include "Settings.h"
+#include "cards/CardController.h"
 #include "lyrics/LyricsCursor.h"
 #include "lyrics/LyricsLoader.h"
 #include "lyrics/LyricsModel.h"
@@ -23,6 +24,7 @@ AppController::AppController(Settings *settings, QObject *parent)
     , m_cursor(new LyricsCursor(this))
     , m_palette(new Palette(this))
     , m_cover(new CoverLoader(m_palette, this))
+    , m_cards(new CardController(settings, m_player, m_clock, m_lyrics, m_cursor, m_cover, this))
 {
     m_cursor->setModel(m_lyrics);
 
@@ -147,6 +149,8 @@ void AppController::registerWithQml(QQmlEngine *engine)
     qmlRegisterSingletonInstance(uri, 1, 0, "Cursor", m_cursor);
     qmlRegisterSingletonInstance(uri, 1, 0, "Cover", m_cover);
     qmlRegisterSingletonInstance(uri, 1, 0, "Palette", m_palette);
+    qmlRegisterSingletonInstance(uri, 1, 0, "Cards", m_cards);
     qmlRegisterUncreatableType<MprisClient>(uri, 1, 0, "MprisClient", QStringLiteral("Use the Player singleton"));
     engine->addImageProvider(QStringLiteral("cover"), new CoverImageProvider(m_cover));
+    engine->addImageProvider(QStringLiteral("card"), new CardImageProvider(m_cards));
 }

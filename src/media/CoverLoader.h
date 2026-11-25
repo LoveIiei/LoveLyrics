@@ -40,6 +40,9 @@ public:
     QString origin() const { return m_origin; }
     QSize size() const { return m_size; }
 
+    // The current cover at full size (null without one). Thread-safe.
+    QImage currentImage() const;
+
     // Thread-safe; used by the image provider. id = "<serial>/full" or "<serial>/blur".
     QImage image(const QString &id) const;
 

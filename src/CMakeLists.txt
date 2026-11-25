@@ -10,6 +10,10 @@ add_library(lovelyrics_core STATIC
     app/WindowManager.cpp app/WindowManager.h
     app/FrameLimiter.cpp app/FrameLimiter.h
     app/Settings.cpp app/Settings.h
+    cards/CardColor.cpp cards/CardColor.h
+    cards/CardController.cpp cards/CardController.h
+    cards/CardRenderer.cpp cards/CardRenderer.h
+    cards/TextWrap.cpp cards/TextWrap.h
     lyrics/LrcParser.cpp lyrics/LrcParser.h
     lyrics/LyricsCursor.cpp lyrics/LyricsCursor.h
     lyrics/LyricsDocument.h

@@ -23,6 +23,7 @@ public:
     {
         bool debugPage = false;
         bool settingsOpen = false;
+        bool cardOpen = false;
     };
 
     WindowManager(AppController *controller, Settings *settings, Options options, QObject *parent = nullptr);

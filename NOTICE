@@ -29,5 +29,17 @@ file in their header. In particular:
   - src/lyrics/LyricsCursor.cpp
       src/components/visualizer/runtime.ts  (active / upcoming line rules)
 
+Lyrics 4U / lyric-card-generator (spacedge/lyric-card-generator), AGPL-3.0
+https://github.com/spacedge/lyric-card-generator
+
+The lyric card export (src/cards/) is a C++/QPainter port of its templates and
+colour logic:
+
+  - src/cards/CardColor.cpp     src/color.js (OKLab/OKLCH, tone palettes, contrast,
+                                cover analysis, card palette styles)
+  - src/cards/TextWrap.cpp      src/text.js (CJK line breaking, kinsoku, orphans)
+  - src/cards/CardRenderer.cpp  src/render/{index,templates,common}.js (the five
+                                templates, fitting fixed ratios, drawing helpers)
+
 Visual styles are re-creations of motion seen in Folia's visualizer modes, built
 from scratch in QML.
