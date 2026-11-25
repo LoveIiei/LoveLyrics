@@ -81,9 +81,6 @@ void Settings::setFullScreenScreen(const QString &v)
 QString Settings::autostartMode() const { return get<QString>("autostart/mode", QStringLiteral("window")); }
 void Settings::setAutostartMode(const QString &v) { set("autostart/mode", v, &Settings::autostartModeChanged); }
 
-QString Settings::autostartScreen() const { return get<QString>("autostart/screen", QString()); }
-void Settings::setAutostartScreen(const QString &v) { set("autostart/screen", v, &Settings::autostartScreenChanged); }
-
 bool Settings::hideWhenPlayerQuits() const { return get<bool>("autostart/hideWhenPlayerQuits", false); }
 void Settings::setHideWhenPlayerQuits(bool v)
 {

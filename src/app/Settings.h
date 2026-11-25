@@ -29,7 +29,6 @@ class Settings : public QObject
     // Monitor used for full screen ("" = the one the window is on).
     Q_PROPERTY(QString fullScreenScreen READ fullScreenScreen WRITE setFullScreenScreen NOTIFY fullScreenScreenChanged)
     Q_PROPERTY(QString autostartMode READ autostartMode WRITE setAutostartMode NOTIFY autostartModeChanged)
-    Q_PROPERTY(QString autostartScreen READ autostartScreen WRITE setAutostartScreen NOTIFY autostartScreenChanged)
     Q_PROPERTY(bool hideWhenPlayerQuits READ hideWhenPlayerQuits WRITE setHideWhenPlayerQuits NOTIFY hideWhenPlayerQuitsChanged)
 
 public:
@@ -75,8 +74,6 @@ public:
     void setFullScreenScreen(const QString &v);
     QString autostartMode() const; // "off", "window", "fullscreen"
     void setAutostartMode(const QString &v);
-    QString autostartScreen() const;
-    void setAutostartScreen(const QString &v);
     bool hideWhenPlayerQuits() const;
     void setHideWhenPlayerQuits(bool v);
 
@@ -108,7 +105,6 @@ signals:
     void fullScreenChanged();
     void fullScreenScreenChanged();
     void autostartModeChanged();
-    void autostartScreenChanged();
     void hideWhenPlayerQuitsChanged();
     void styleValueChanged(const QString &style, const QString &key);
 

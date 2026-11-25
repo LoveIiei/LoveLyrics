@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #include "AppInfo.h"
 #include "app/AppController.h"
-#include "app/FrameLimiter.h"
+#include "app/AutostartController.h"
 #include "app/Settings.h"
+#include "app/SingleInstance.h"
+#include "app/WindowManager.h"
 #include "mpris/MprisClient.h"
 
 #include <QCommandLineParser>
 #include <QFont>
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QQmlEngine>
 #include <QQuickWindow>
 #include <QTimer>
+
+#include <cstdio>
 
 int main(int argc, char *argv[])
 {
@@ -26,25 +29,47 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(QStringLiteral("Immersive synced lyrics for Strawberry (MPRIS)."));
     parser.addHelpOption();
     parser.addVersionOption();
+    const QCommandLineOption backgroundOpt(
+        QStringLiteral("background"),
+        QStringLiteral("Start without a window and show it when the player starts playing (used at login)."));
+    const QCommandLineOption quitOpt(QStringLiteral("quit"), QStringLiteral("Quit the running instance."));
     const QCommandLineOption playerOpt(
-        QStringLiteral("player"), QStringLiteral("MPRIS player to follow for this run (default: the saved setting, strawberry)."),
+        QStringLiteral("player"),
+        QStringLiteral("MPRIS player to follow for this run (default: the saved setting, strawberry)."),
         QStringLiteral("name"));
     const QCommandLineOption debugOpt(QStringLiteral("debug"), QStringLiteral("Start on the debug page."));
+    const QCommandLineOption settingsOpt(QStringLiteral("settings"), QStringLiteral("Open the settings panel."));
     const QCommandLineOption grabOpt(QStringLiteral("grab"),
                                      QStringLiteral("Dev: save a screenshot of the window to <file> and quit."),
                                      QStringLiteral("file"));
     const QCommandLineOption grabAfterOpt(QStringLiteral("grab-after"),
                                           QStringLiteral("Dev: delay before --grab, in ms (default 3000)."),
                                           QStringLiteral("ms"), QStringLiteral("3000"));
-    parser.addOption(playerOpt);
-    const QCommandLineOption settingsOpt(QStringLiteral("settings"), QStringLiteral("Open the settings panel."));
-    parser.addOption(debugOpt);
-    parser.addOption(settingsOpt);
-    parser.addOption(grabOpt);
-    parser.addOption(grabAfterOpt);
+    parser.addOptions({backgroundOpt, quitOpt, playerOpt, debugOpt, settingsOpt, grabOpt, grabAfterOpt});
     parser.process(app);
 
-    // Destroyed after the engine (declared first), since QML and the image provider use it.
+    // ---- one instance per session -------------------------------------------------------
+    SingleInstance instance;
+    if (!instance.registerPrimary()) {
+        if (parser.isSet(quitOpt))
+            return SingleInstance::callRunning(QStringLiteral("Quit")) ? 0 : 1;
+        if (parser.isSet(backgroundOpt))
+            return 0; // already running; nothing to show
+        // Hand our activation token to the running copy so it may take focus.
+        const QString token = qEnvironmentVariable("XDG_ACTIVATION_TOKEN");
+        return SingleInstance::callRunning(QStringLiteral("Activate"), {token}) ? 0 : 1;
+    }
+    if (parser.isSet(quitOpt)) {
+        std::fputs("lovelyrics is not running.\n", stderr);
+        return 0;
+    }
+    qunsetenv("XDG_ACTIVATION_TOKEN"); // only valid for our own first window
+
+    const bool resident = parser.isSet(backgroundOpt);
+    // Resident: closing the window only hides it; quit with Ctrl+Q, the settings panel
+    // or `lovelyrics --quit`.
+    QGuiApplication::setQuitOnLastWindowClosed(!resident);
+
     // LOVELYRICS_CONFIG=/path/file.conf uses another settings file (tests, dev runs).
     const QString configOverride = qEnvironmentVariable("LOVELYRICS_CONFIG");
     Settings settings(configOverride.isEmpty() ? Settings::defaultPath() : configOverride);
@@ -60,29 +85,23 @@ int main(int argc, char *argv[])
     updateFontFallback();
     QObject::connect(&settings, &Settings::fontFamilyChanged, &app, updateFontFallback);
 
-    QQmlApplicationEngine engine;
-    controller.registerWithQml(&engine);
-    engine.setInitialProperties({{QStringLiteral("startOnDebugPage"), parser.isSet(debugOpt)},
-                                 {QStringLiteral("settingsOpen"), parser.isSet(settingsOpt)}});
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
-                     [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
-    engine.loadFromModule("LoveLyrics", "Main");
+    WindowManager windows(&controller, &settings,
+                          {.debugPage = parser.isSet(debugOpt), .settingsOpen = parser.isSet(settingsOpt)});
+    AutostartController autostart(controller.player(), &windows, &settings, resident);
+    qmlRegisterSingletonInstance("LoveLyrics.Backend", 1, 0, "Autostart", &autostart);
 
-    auto *window = engine.rootObjects().isEmpty() ? nullptr : qobject_cast<QQuickWindow *>(engine.rootObjects().first());
-    if (window) {
-        auto *limiter = new FrameLimiter(window, &app);
-        limiter->setCap(settings.fpsCap());
-        QObject::connect(&settings, &Settings::fpsCapChanged, limiter, [limiter, &settings] {
-            limiter->setCap(settings.fpsCap());
-        });
-    }
+    QObject::connect(&instance, &SingleInstance::activateRequested, &app,
+                     [&windows](const QString &token) { windows.show(false, token); });
+    QObject::connect(&instance, &SingleInstance::quitRequested, &app, &QCoreApplication::quit, Qt::QueuedConnection);
+    QObject::connect(&app, &QCoreApplication::aboutToQuit, &windows, &WindowManager::saveState);
+
+    if (!resident || parser.isSet(grabOpt))
+        windows.show(settings.fullScreen());
 
     if (parser.isSet(grabOpt)) {
         const QString file = parser.value(grabOpt);
-        QTimer::singleShot(parser.value(grabAfterOpt).toInt(), &app, [&engine, file] {
-            const auto roots = engine.rootObjects();
-            auto *window = roots.isEmpty() ? nullptr : qobject_cast<QQuickWindow *>(roots.first());
-            const bool ok = window && window->grabWindow().save(file);
+        QTimer::singleShot(parser.value(grabAfterOpt).toInt(), &app, [&windows, file] {
+            const bool ok = windows.window() && windows.window()->grabWindow().save(file);
             qInfo("grab %s: %s", qPrintable(file), ok ? "ok" : "failed");
             QCoreApplication::exit(ok ? 0 : 1);
         });

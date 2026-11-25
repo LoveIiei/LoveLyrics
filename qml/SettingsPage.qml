@@ -309,6 +309,53 @@ Item {
                     }
                 }
 
+                // ---- Start ---------------------------------------------------------------
+                SectionTitle { text: qsTr("Start") }
+                Row2 {
+                    Label { text: qsTr("Start in the background at login"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                    Switch {
+                        checked: Autostart.startAtLogin
+                        onToggled: Autostart.startAtLogin = checked
+                    }
+                }
+                Row2 {
+                    Label { text: qsTr("When playback starts"); Layout.preferredWidth: 150; wrapMode: Text.Wrap }
+                    ComboBox {
+                        Layout.fillWidth: true
+                        readonly property var modes: ["off", "window", "fullscreen"]
+                        model: [qsTr("Do nothing"), qsTr("Show the window"), qsTr("Show full screen")]
+                        currentIndex: Math.max(0, modes.indexOf(Settings.autostartMode))
+                        onActivated: (i) => Settings.autostartMode = modes[i]
+                    }
+                }
+                Row2 {
+                    Label { text: qsTr("Hide when the player quits"); Layout.fillWidth: true }
+                    Switch {
+                        checked: Settings.hideWhenPlayerQuits
+                        onToggled: Settings.hideWhenPlayerQuits = checked
+                    }
+                }
+                Label {
+                    Layout.leftMargin: 24
+                    Layout.rightMargin: 24
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
+                    opacity: 0.55
+                    font.pixelSize: 12
+                    text: (Autostart.resident
+                           ? qsTr("Running in the background: closing the window keeps listening.")
+                           : qsTr("These apply when started in the background (at login, or lovelyrics --background)."))
+                          + " " + qsTr("Full screen uses the monitor chosen under Display.")
+                }
+                Row2 {
+                    Item { Layout.fillWidth: true }
+                    Button {
+                        text: qsTr("Quit Love Lyrics")
+                        flat: true
+                        onClicked: Qt.quit()
+                    }
+                }
+
                 // ---- About ---------------------------------------------------------------
                 SectionTitle { text: qsTr("About") }
                 Label {

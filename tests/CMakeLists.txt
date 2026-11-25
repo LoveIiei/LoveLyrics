@@ -26,3 +26,13 @@ if(DBUS_RUN_SESSION)
 endif()
 # The plain variant would run on the user's session bus; only the isolated one is registered.
 set_tests_properties(tst_mpris PROPERTIES DISABLED TRUE LABELS integration)
+
+# Phase 4: the app binary in --background mode, single instance, auto show/hide.
+lovelyrics_add_test(tst_background)
+target_compile_definitions(tst_background PRIVATE APP_BINARY="$<TARGET_FILE:${APP_ID}>")
+add_dependencies(tst_background ${APP_ID})
+set_tests_properties(tst_background PROPERTIES DISABLED TRUE LABELS integration)
+if(DBUS_RUN_SESSION)
+    add_test(NAME tst_background_isolated COMMAND ${DBUS_RUN_SESSION} -- $<TARGET_FILE:tst_background>)
+    set_tests_properties(tst_background_isolated PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" LABELS integration TIMEOUT 90)
+endif()

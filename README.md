@@ -76,6 +76,23 @@ the monitor used for full screen and a frame-rate cap (60/120 fps, to save batte
 the 240 Hz panel). `lovelyrics --player NAME`
 follows another MPRIS player for one run.
 
+### Starting with Strawberry
+
+Settings → *Start* → **Start in the background at login** adds
+`~/.config/autostart/lovelyrics.desktop`, which runs `lovelyrics --background` at
+login. In that mode no window is created (about 40 MB of RAM, idle) until the player
+starts playing; then the window appears, normally or full screen on the monitor
+chosen under *Display* (setting *When playback starts*). Closing the window keeps it
+listening; it stays closed until the player stops or restarts, so pausing and
+resuming won't bring it back. *Hide when the player quits* closes it with Strawberry.
+
+Only one copy runs per session: launching Love Lyrics again shows the running window.
+Quit with `Ctrl+Q`, the button at the bottom of the settings panel, or:
+
+```fish
+lovelyrics --quit
+```
+
 ## Testing without Strawberry
 
 `tools/run_with_fake.sh` starts a private D-Bus session with the fake player

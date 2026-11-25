@@ -12,7 +12,7 @@ Window {
     height: 800
     minimumWidth: 480
     minimumHeight: 320
-    visible: true
+    visible: false // shown by C++ via present()
     color: "black"
     title: Player.title ? Player.title + " — " + Qt.application.displayName : Qt.application.displayName
 
@@ -223,6 +223,21 @@ Window {
         }
     }
 
+    // Called from C++ (WindowManager): show the window, optionally full screen on the
+    // chosen monitor, raise it and ask for focus.
+    function present(fullScreen) {
+        if (fullScreen) {
+            for (const s of Qt.application.screens)
+                if (s.name === Settings.fullScreenScreen && s !== root.screen)
+                    root.screen = s
+            showFullScreen()
+        } else if (!visible) {
+            showNormal()
+        }
+        raise()
+        requestActivate()
+    }
+
     function nextStyle() {
         const name = Registry.next(Settings.style)
         Settings.style = name
@@ -261,12 +276,6 @@ Window {
         for (const s of Qt.application.screens)
             if (s.name === Settings.windowScreen)
                 root.screen = s
-        if (Settings.fullScreen) {
-            for (const s of Qt.application.screens)
-                if (s.name === Settings.fullScreenScreen)
-                    root.screen = s
-            showFullScreen()
-        }
     }
 
     // --- hotkeys -------------------------------------------------------------------------
