@@ -1,0 +1,32 @@
+# Local build from the working tree:  cd packaging; makepkg -si
+pkgname=lovelyrics
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Immersive synced lyrics and album art for Strawberry Music Player (MPRIS)"
+arch=('x86_64')
+license=('AGPL-3.0-or-later')
+depends=('qt6-base' 'qt6-declarative' 'qt6-svg' 'taglib')
+makedepends=('cmake' 'ninja' 'qt6-shadertools')
+checkdepends=('python-dbus' 'python-gobject')
+optdepends=('strawberry: the music player this app follows'
+            'noto-fonts-cjk: Chinese/Japanese/Korean lyrics')
+source=()
+sha256sums=()
+
+_srcdir() { realpath "$startdir/.."; }
+
+build() {
+    cmake -S "$(_srcdir)" -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+}
+
+check() {
+    ctest --test-dir build --output-on-failure -LE integration
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+    install -Dm644 "$(_srcdir)/NOTICE" "$pkgdir/usr/share/licenses/$pkgname/NOTICE"
+}

@@ -1,0 +1,33 @@
+Love Lyrics
+Copyright (C) 2026 Love Lyrics contributors
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. See LICENSE.
+
+-------------------------------------------------------------------------------
+Credits
+-------------------------------------------------------------------------------
+
+Folia (chthollyphile/folia-major), AGPL-3.0
+https://github.com/chthollyphile/folia-major
+
+Love Lyrics re-implements, in C++/QML, ideas and logic from Folia. No Folia code
+is included verbatim. Files whose logic follows a Folia source file name that
+file in their header. In particular:
+
+  - src/lyrics/LrcParser.cpp
+      src/utils/lyrics/parserCore.ts        (LRC / enhanced LRC timestamp rules)
+      src/utils/lyrics/timelineSplitter.ts  (original + translation sharing a
+                                             timestamp; blank-line handling)
+      src/utils/lyrics/estimatedLineTiming.ts (line end estimation, weighted
+                                             word timing for CJK / Latin)
+  - src/lyrics/TextDecoding.cpp
+      src/utils/lyrics/lyricFileDecoding.ts (BOM -> strict UTF-8 -> GB18030,
+                                             line ending normalisation)
+  - src/lyrics/LyricsCursor.cpp
+      src/components/visualizer/runtime.ts  (active / upcoming line rules)
+
+Visual styles are re-creations of motion seen in Folia's visualizer modes, built
+from scratch in QML.

@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+#pragma once
+
+namespace AppInfo {
+inline constexpr const char *Id = "@APP_ID@";
+inline constexpr const char *Name = "@APP_NAME@";
+inline constexpr const char *Version = "@PROJECT_VERSION@";
+inline constexpr const char *DBusName = "@APP_DBUS_NAME@";
+} // namespace AppInfo

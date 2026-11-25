@@ -1,0 +1,9 @@
+/build*/
+/.cache/
+/.qtcreator/
+CMakeLists.txt.user
+compile_commands.json
+__pycache__/
+packaging/src/
+packaging/pkg/
+packaging/*.pkg.tar.*

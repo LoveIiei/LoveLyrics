@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Love Lyrics
+GenericName=Lyrics Viewer
+Comment=Immersive synced lyrics and album art for Strawberry
+Exec=lovelyrics %U
+Icon=lovelyrics
+Terminal=false
+Categories=AudioVideo;Audio;Player;Qt;
+Keywords=lyrics;karaoke;lrc;strawberry;mpris;
+StartupNotify=true
+StartupWMClass=lovelyrics

@@ -1,0 +1,22 @@
+---
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+IndentWidth: 4
+ColumnLimit: 110
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterNamespace: false
+  SplitEmptyFunction: false
+PointerAlignment: Right
+SortIncludes: CaseInsensitive
+IncludeBlocks: Preserve
+SpaceAfterTemplateKeyword: false
