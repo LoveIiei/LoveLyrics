@@ -14,6 +14,7 @@ add_library(lovelyrics_core STATIC
     cards/CardController.cpp cards/CardController.h
     cards/CardRenderer.cpp cards/CardRenderer.h
     cards/TextWrap.cpp cards/TextWrap.h
+    fx/ClockworkPart.cpp fx/ClockworkPart.h
     fx/SparkField.cpp fx/SparkField.h
     lyrics/LrcParser.cpp lyrics/LrcParser.h
     lyrics/LyricsCursor.cpp lyrics/LyricsCursor.h

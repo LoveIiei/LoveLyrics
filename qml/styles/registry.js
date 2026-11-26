@@ -57,6 +57,17 @@ var styles = [
         ],
     },
     {
+        name: "Pendolo",
+        file: "Pendolo/Style.qml",
+        description: "时计 — lyrics are spokes of a ticking clockwork wheel (after Folia)",
+        tunables: [
+            { key: "snap", label: "Tick snappiness", min: 0.5, max: 3, step: 0.1, value: 2.0 },
+            { key: "activeScale", label: "Current line size", min: 1, max: 1.6, step: 0.05, value: 1.25 },
+            { key: "decor", label: "Clockwork brightness", min: 0.2, max: 1, step: 0.05, value: 0.6 },
+            { key: "coverOnDial", type: "bool", label: "Cover on the dial", value: true },
+        ],
+    },
+    {
         name: "Still",
         file: "Still/Style.qml",
         description: "Calm, readable column (used for unsynced lyrics)",

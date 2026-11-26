@@ -35,6 +35,9 @@ file in their header. In particular:
   - qml/styles/Hanabi/hanabi.js, qml/styles/Hanabi/Style.qml (花火)
       src/components/visualizer/hanabi/text/animations.ts (glyph poses),
       catalog.ts (shot families), color.ts (palette roles)
+  - qml/styles/Pendolo/ (时计), src/fx/ClockworkPart.cpp
+      src/components/visualizer/pendolo/ (wheel geometry, escapement spring,
+      pendoloClockworkDraw2d.ts clockwork drawing and palette)
   - src/fx/SparkField.cpp
       src/components/visualizer/hanabi/mg/burstPlan.ts (closed-form firework model)
 

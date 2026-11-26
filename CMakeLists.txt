@@ -61,6 +61,7 @@ qt_add_qml_module(${APP_ID}
         qml/styles/Partita/partita.js
         qml/styles/Hanabi/Style.qml
         qml/styles/Hanabi/hanabi.js
+        qml/styles/Pendolo/Style.qml
     RESOURCES
         qml/icons/play.svg
         qml/icons/pause.svg
