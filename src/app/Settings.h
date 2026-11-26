@@ -25,6 +25,9 @@ class Settings : public QObject
     Q_PROPERTY(double fontScale READ fontScale WRITE setFontScale NOTIFY fontScaleChanged)
     Q_PROPERTY(QString backgroundMode READ backgroundMode WRITE setBackgroundMode NOTIFY backgroundModeChanged)
     Q_PROPERTY(double backgroundPulse READ backgroundPulse WRITE setBackgroundPulse NOTIFY backgroundPulseChanged)
+    // When the control bar hides itself: "always" (after 2 s idle), "fullscreen" (only in
+    // full screen), "never" (always visible).
+    Q_PROPERTY(QString controlsAutoHide READ controlsAutoHide WRITE setControlsAutoHide NOTIFY controlsAutoHideChanged)
     Q_PROPERTY(int fpsCap READ fpsCap WRITE setFpsCap NOTIFY fpsCapChanged)
     Q_PROPERTY(bool karaokeFill READ karaokeFill WRITE setKaraokeFill NOTIFY karaokeFillChanged)
     Q_PROPERTY(QRect windowGeometry READ windowGeometry WRITE setWindowGeometry NOTIFY windowGeometryChanged)
@@ -70,6 +73,8 @@ public:
     void setBackgroundMode(const QString &v);
     double backgroundPulse() const;
     void setBackgroundPulse(double v);
+    QString controlsAutoHide() const;
+    void setControlsAutoHide(const QString &v);
     int fpsCap() const;
     void setFpsCap(int v);
     bool karaokeFill() const;
@@ -111,6 +116,7 @@ signals:
     void fontScaleChanged();
     void backgroundModeChanged();
     void fpsCapChanged();
+    void controlsAutoHideChanged();
     void backgroundPulseChanged();
     void karaokeFillChanged();
     void windowGeometryChanged();

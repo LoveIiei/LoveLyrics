@@ -336,6 +336,16 @@ Item {
                     }
                 }
                 Row2 {
+                    Label { text: qsTr("Hide the control bar"); Layout.preferredWidth: 150; wrapMode: Text.Wrap }
+                    ComboBox {
+                        Layout.fillWidth: true
+                        readonly property var modes: ["always", "fullscreen", "never"]
+                        model: [qsTr("When idle"), qsTr("When idle, in full screen only"), qsTr("Never (always visible)")]
+                        currentIndex: Math.max(0, modes.indexOf(Settings.controlsAutoHide))
+                        onActivated: (i) => Settings.controlsAutoHide = modes[i]
+                    }
+                }
+                Row2 {
                     Label { text: qsTr("Frame-rate cap"); Layout.preferredWidth: 150 }
                     ComboBox {
                         Layout.fillWidth: true

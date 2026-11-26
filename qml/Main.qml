@@ -156,7 +156,7 @@ Window {
         scale: root.uiScale
         transformOrigin: Item.BottomLeft
         theme: theme
-        shown: root.controlsShown
+        shown: root.controlsShown || !root.controlsAutoHide
         fullScreen: root.isFullScreen
         onToggleFullScreen: root.toggleFullScreen()
         onNextStyle: root.nextStyle()
@@ -196,6 +196,10 @@ Window {
 
     // --- auto-hide of cursor and controls ---------------------------------------------
     property bool controlsShown: true
+    // Settings: hide the bar when idle always, only in full screen, or never. The cursor
+    // still hides when idle in every mode.
+    readonly property bool controlsAutoHide: Settings.controlsAutoHide === "always"
+                                             || (Settings.controlsAutoHide === "fullscreen" && root.isFullScreen)
     Timer {
         id: hideTimer
         interval: 2000
@@ -214,7 +218,16 @@ Window {
     HoverHandler {
         id: windowHover
         cursorShape: root.controlsShown ? Qt.ArrowCursor : Qt.BlankCursor
-        onPointChanged: root.poke()
+        // Qt re-sends hover updates while items animate under a still pointer (the lyrics
+        // always move), so only real pointer movement counts as activity.
+        property point last: Qt.point(-1, -1)
+        onPointChanged: {
+            const p = point.position
+            if (Math.abs(p.x - last.x) + Math.abs(p.y - last.y) < 2)
+                return
+            last = p
+            root.poke()
+        }
     }
 
     // --- actions -------------------------------------------------------------------------

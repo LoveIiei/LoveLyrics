@@ -63,7 +63,8 @@ Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS
 | `D` | debug page |
 
 Click a lyric line to jump to it. Moving the mouse shows the controls; they and the
-cursor hide after 2 s.
+cursor hide after 2 s. Settings → Display → *Hide the control bar* chooses when the bar
+hides: when idle (default), when idle in full screen only, or never.
 
 ### Styles
 

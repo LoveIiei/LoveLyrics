@@ -65,6 +65,9 @@ void Settings::setBackgroundMode(const QString &v) { set("view/background", v, &
 double Settings::backgroundPulse() const { return get<double>("view/backgroundPulse", 0.5); }
 void Settings::setBackgroundPulse(double v) { set("view/backgroundPulse", v, &Settings::backgroundPulseChanged); }
 
+QString Settings::controlsAutoHide() const { return get<QString>("view/controlsAutoHide", QStringLiteral("always")); }
+void Settings::setControlsAutoHide(const QString &v) { set("view/controlsAutoHide", v, &Settings::controlsAutoHideChanged); }
+
 int Settings::fpsCap() const { return get<int>("view/fpsCap", 0); }
 void Settings::setFpsCap(int v) { set("view/fpsCap", v, &Settings::fpsCapChanged); }
 
