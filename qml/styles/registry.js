@@ -68,6 +68,21 @@ var styles = [
         ],
     },
     {
+        name: "Lumiere",
+        file: "Lumiere/Style.qml",
+        description: "绘光 — stage lights through haze; words light up where the beams fall (after Folia)",
+        tunables: [
+            { key: "intensity", label: "Light", min: 0.3, max: 2, step: 0.05, value: 1.0 },
+            { key: "fog", label: "Haze", min: 0, max: 2, step: 0.05, value: 1.0 },
+            { key: "dust", label: "Dust", min: 0, max: 2, step: 0.1, value: 1.0 },
+            { key: "unlit", label: "Unsung words", min: 0.05, max: 0.6, step: 0.01, value: 0.22 },
+            { key: "themeColor", label: "Cover colour in the light", min: 0, max: 1, step: 0.05, value: 0.3 },
+            { key: "quality", label: "Light quality (resolution)", min: 0.3, max: 1, step: 0.05, value: 0.5 },
+            { key: "echo", type: "bool", label: "Giant echo of the line", value: true },
+            { key: "frame", type: "bool", label: "Viewfinder frame", value: true },
+        ],
+    },
+    {
         name: "Still",
         file: "Still/Style.qml",
         description: "Calm, readable column (used for unsynced lyrics)",

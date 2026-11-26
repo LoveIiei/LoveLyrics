@@ -38,6 +38,10 @@ file in their header. In particular:
   - qml/styles/Pendolo/ (时计), src/fx/ClockworkPart.cpp
       src/components/visualizer/pendolo/ (wheel geometry, escapement spring,
       pendoloClockworkDraw2d.ts clockwork drawing and palette)
+  - qml/styles/Lumiere/ (绘光), shaders/lightfield.frag
+      src/components/visualizer/lumiere/light/rig.ts (beam model, beamMask),
+      light/lightFieldShader.ts (haze, glare, tone mapping), rigs/base.ts and
+      rigs/stage.ts (the stage light rigs), text/reveal.ts (flash envelope)
   - src/fx/SparkField.cpp
       src/components/visualizer/hanabi/mg/burstPlan.ts (closed-form firework model)
 
