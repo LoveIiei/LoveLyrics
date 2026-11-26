@@ -161,6 +161,32 @@ Item {
                     }
                 }
 
+                Row2 {
+                    Label { text: qsTr("Look up lyrics online (LRCLIB)"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                    Switch {
+                        checked: Settings.onlineLyrics
+                        onToggled: Settings.onlineLyrics = checked
+                    }
+                }
+                Row2 {
+                    visible: Settings.onlineLyrics
+                    Label { text: qsTr("Also save them as .lrc next to the song"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                    Switch {
+                        checked: Settings.saveOnlineLyrics
+                        onToggled: Settings.saveOnlineLyrics = checked
+                    }
+                }
+                Label {
+                    Layout.leftMargin: 24
+                    Layout.rightMargin: 24
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
+                    opacity: 0.55
+                    font.pixelSize: 12
+                    text: qsTr("When a song has no synced lyrics, its artist, title, album and length are sent to lrclib.net. "
+                               + "Downloads are kept in ~/.cache/lovelyrics/lyrics, so each song is looked up once.")
+                }
+
                 // ---- Style ---------------------------------------------------------------
                 SectionTitle { text: qsTr("Style") }
                 Row2 {
@@ -230,6 +256,17 @@ Item {
                         model: [qsTr("Blurred cover"), qsTr("Colour gradient")]
                         currentIndex: Math.max(0, values.indexOf(Settings.backgroundMode))
                         onActivated: (i) => Settings.backgroundMode = values[i]
+                    }
+                }
+                Row2 {
+                    Label { text: qsTr("Background pulse on lines"); Layout.preferredWidth: 150; wrapMode: Text.Wrap }
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0
+                        to: 1
+                        stepSize: 0.05
+                        value: Settings.backgroundPulse
+                        onMoved: Settings.backgroundPulse = value
                     }
                 }
                 Row2 {

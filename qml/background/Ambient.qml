@@ -79,6 +79,31 @@ Item {
         Behavior on opacity { NumberAnimation { duration: 900 } }
     }
 
+    // "Beat" pulse without audio: a soft flash of the cover's vibrant colour on every line
+    // start (and every word start for word-timed lyrics), faked from the lyric timing.
+    readonly property real pulseStrength: Settings.backgroundPulse
+    readonly property real pulse: {
+        if (pulseStrength <= 0 || !Lyrics.synced)
+            return 0
+        const pos = Clock.lyricsPositionMs
+        let since = Infinity
+        const i = Cursor.focusIndex
+        if (i >= 0) {
+            const line = Lyrics.get(i) // cheap: cached row data
+            since = pos - line.startMs
+            if (Lyrics.hasWordTiming && !line.wordsEstimated)
+                for (const w of line.words)
+                    if (w.startMs <= pos) since = Math.min(since, (pos - w.startMs) * 1.6) // words: smaller kicks
+        }
+        return since >= 0 && since < 1500 ? Math.exp(-since / 420) : 0
+    }
+    Rectangle {
+        anchors.fill: parent
+        color: root.theme.vibrant
+        opacity: root.pulse * 0.1 * root.pulseStrength
+        visible: opacity > 0.003
+    }
+
     ShaderEffect {
         anchors.fill: parent
         property real time: root.animate ? root.phase * 600.0 : 0

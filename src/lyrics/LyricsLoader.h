@@ -33,7 +33,7 @@ signals:
     void loadingChanged(bool loading);
 
 private:
-    QStringList m_order = DefaultSourceOrder;
+    QStringList m_order = DefaultSourceOrder + QStringList{QStringLiteral("cache")};
     quint64 m_request = 0;
     int m_pending = 0;
 };

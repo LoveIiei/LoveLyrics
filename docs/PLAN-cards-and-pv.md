@@ -70,3 +70,9 @@ boundaries.
 
 **Order**: groundwork → 云阶 Partita → 花火 Hanabi → 时计 Pendolo → 绘光 Lumiere → 雾笺 Nebbia.
 Each one ends with screenshots, a perf check at 4K, a commit, and a pause for your review.
+
+## Status (2026-11-26)
+
+Done: lyric cards; groundwork; Partita, Hanabi, Pendolo, Lumiere. Left: Nebbia (雾笺).
+Phase 6 of the original plan: LRCLIB fallback (opt-in, cached, optional sidecar),
+background pulse from lyric timing, screenshot key — done.

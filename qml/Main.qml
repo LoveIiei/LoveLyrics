@@ -258,6 +258,13 @@ Window {
                    : qsTr("Style: %1").arg(name))
     }
 
+    function saveScreenshot() {
+        const path = App.screenshotPath()
+        root.contentItem.grabToImage(result => {
+            toast.show(result.saveToFile(path) ? qsTr("Screenshot saved to %1").arg(path) : qsTr("Could not save the screenshot"))
+        })
+    }
+
     function showOffsetToast() {
         const ms = Clock.trackOffsetMs
         toast.show(ms === 0 ? qsTr("Lyrics offset: none")
@@ -314,6 +321,7 @@ Window {
         }
     }
     Shortcut { sequence: "C"; enabled: !root.panelOpen; onActivated: Settings.showCoverInfo = !Settings.showCoverInfo }
+    Shortcut { sequence: "P"; enabled: !root.panelOpen; onActivated: root.saveScreenshot() }
     Shortcut { sequence: "D"; enabled: !root.panelOpen; onActivated: root.debugVisible = !root.debugVisible }
     Shortcut { sequences: [StandardKey.Quit]; onActivated: { root.saveGeometry(); Qt.quit() } }
 }

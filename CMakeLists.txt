@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Qml QuickControls2 DBus Concurrent ShaderTools)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Qml QuickControls2 DBus Concurrent Network ShaderTools)
 find_package(TagLib 2 REQUIRED CONFIG)
 # ICU (already required by qt6-base): dictionary word breaking for Chinese / Japanese.
 find_package(ICU REQUIRED COMPONENTS uc)

@@ -5,7 +5,10 @@
 #include "cards/CardController.h"
 #include "fx/ClockworkPart.h"
 #include "fx/SparkField.h"
+#include "lyrics/LrcParser.h"
+#include "lyrics/LrclibClient.h"
 #include "lyrics/LyricsCursor.h"
+#include "lyrics/SongStructure.h"
 #include "lyrics/LyricsLoader.h"
 #include "lyrics/LyricsModel.h"
 #include "media/CoverLoader.h"
@@ -14,6 +17,11 @@
 #include "mpris/MprisClient.h"
 #include "playback/PlaybackClock.h"
 
+#include <QDateTime>
+#include <QDir>
+#include <QRegularExpression>
+#include <QFile>
+#include <QFileInfo>
 #include <QQmlEngine>
 
 AppController::AppController(Settings *settings, QObject *parent)
@@ -27,6 +35,7 @@ AppController::AppController(Settings *settings, QObject *parent)
     , m_palette(new Palette(this))
     , m_cover(new CoverLoader(m_palette, this))
     , m_cards(new CardController(settings, m_player, m_clock, m_lyrics, m_cursor, m_cover, this))
+    , m_lrclib(new LrclibClient(this))
 {
     m_cursor->setModel(m_lyrics);
 
@@ -60,7 +69,28 @@ AppController::AppController(Settings *settings, QObject *parent)
         else if (!m_player->track().isEmpty())
             m_cover->load(m_player->track()); // art often arrives a moment after the track
     });
-    connect(m_loader, &LyricsLoader::loaded, m_lyrics, &LyricsModel::setDocument);
+    connect(m_loader, &LyricsLoader::loaded, this, &AppController::onLyricsLoaded);
+    connect(m_lrclib, &LrclibClient::found, this, [this](quint64 id, const QString &text, bool synced) {
+        if (id != m_onlineRequest)
+            return; // the track changed meanwhile
+        const TrackInfo &track = m_player->track();
+        // Keep local unsynced lyrics over online plain ones.
+        if (!synced && m_lyrics->hasLyrics())
+            return;
+        LrclibClient::writeCache(track, text);
+        if (m_settings->saveOnlineLyrics() && !m_localPath.isEmpty()
+            && TrackResolver::findSidecarLyrics(m_localPath).isEmpty()) {
+            const QFileInfo audio(m_localPath);
+            QFile f(audio.absoluteDir().filePath(audio.completeBaseName() + QStringLiteral(".lrc")));
+            if (f.open(QIODevice::WriteOnly | QIODevice::NewOnly))
+                f.write(text.toUtf8());
+        }
+        LyricsDocument doc = LrcParser::parse(text);
+        SongStructure::analyze(doc);
+        doc.source = QStringLiteral("lrclib");
+        doc.sourcePath = LrclibClient::cachePath(track);
+        m_lyrics->setDocument(doc);
+    });
     connect(m_loader, &LyricsLoader::loadingChanged, m_lyrics, &LyricsModel::setLoading);
 
     // Clock -> cursor, every frame
@@ -72,6 +102,7 @@ AppController::~AppController() = default;
 
 void AppController::onTrackChanged(const TrackInfo &track)
 {
+    ++m_onlineRequest; // an online answer for the previous track is ignored
     // Never show the previous track's lyrics, even for a moment.
     m_loader->cancel();
     m_lyrics->clear();
@@ -111,6 +142,14 @@ void AppController::loadTrackMedia()
     m_cover->load(track);
 }
 
+void AppController::onLyricsLoaded(const LyricsDocument &doc)
+{
+    m_lyrics->setDocument(doc);
+    // Nothing local (or only unsynced lyrics): ask LRCLIB, if the user allowed it.
+    if ((doc.isEmpty() || !doc.synced) && m_settings->onlineLyrics() && !m_player->track().isEmpty())
+        m_lrclib->lookup(m_player->track(), ++m_onlineRequest);
+}
+
 void AppController::setViewActive(bool active)
 {
     if (m_viewActive == active)
@@ -138,6 +177,20 @@ QString AppController::formatTime(double ms) const
 {
     const qint64 total = qint64(std::max(0.0, ms)) / 1000;
     return QStringLiteral("%1:%2").arg(total / 60).arg(total % 60, 2, 10, QLatin1Char('0'));
+}
+
+QString AppController::screenshotPath() const
+{
+    const QString dir = CardController::exportDirectory();
+    QDir().mkpath(dir);
+    QString base = m_player->title().isEmpty() ? QStringLiteral("Love Lyrics")
+                                               : m_player->artist() + QStringLiteral(" - ") + m_player->title();
+    base.replace(QRegularExpression(QStringLiteral(R"([/\\:*?"<>|\x00-\x1f])")), QStringLiteral("_"));
+    base = base.left(100) + QStringLiteral(" ") + QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh.mm.ss"));
+    QString path = dir + QLatin1Char('/') + base + QStringLiteral(".png");
+    for (int n = 2; QFile::exists(path); ++n)
+        path = dir + QLatin1Char('/') + base + QStringLiteral(" (%1).png").arg(n);
+    return path;
 }
 
 void AppController::registerWithQml(QQmlEngine *engine)

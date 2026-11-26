@@ -2,6 +2,7 @@
 #include "LyricsLoader.h"
 
 #include "LrcParser.h"
+#include "LrclibClient.h"
 #include "SongStructure.h"
 #include "TextDecoding.h"
 #include "media/TagReader.h"
@@ -41,6 +42,8 @@ LyricsLoader::LyricsLoader(QObject *parent)
 void LyricsLoader::setSourceOrder(const QStringList &order)
 {
     m_order = order.isEmpty() ? DefaultSourceOrder : order;
+    if (!m_order.contains(QStringLiteral("cache")))
+        m_order << QStringLiteral("cache"); // downloaded lyrics come last, whatever the order
 }
 
 LyricsDocument LyricsLoader::loadNow(const TrackInfo &track, const QStringList &order)
@@ -67,6 +70,15 @@ LyricsDocument LyricsLoader::loadNow(const TrackInfo &track, const QStringList &
             if (text.trimmed().isEmpty())
                 continue;
             LyricsDocument doc = parseWithSource(text, source, path);
+            if (!doc.isEmpty())
+                return doc;
+        } else if (source == u"cache") {
+            // Lyrics downloaded earlier from LRCLIB.
+            const QString cached = LrclibClient::cachePath(track);
+            QFile f(cached);
+            if (cached.isEmpty() || !f.open(QIODevice::ReadOnly))
+                continue;
+            LyricsDocument doc = parseWithSource(TextDecoding::decode(f.readAll()), QStringLiteral("lrclib"), cached);
             if (!doc.isEmpty())
                 return doc;
         } else if (source == u"mpris") {

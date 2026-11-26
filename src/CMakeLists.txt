@@ -17,6 +17,7 @@ add_library(lovelyrics_core STATIC
     fx/ClockworkPart.cpp fx/ClockworkPart.h
     fx/SparkField.cpp fx/SparkField.h
     lyrics/LrcParser.cpp lyrics/LrcParser.h
+    lyrics/LrclibClient.cpp lyrics/LrclibClient.h
     lyrics/LyricsCursor.cpp lyrics/LyricsCursor.h
     lyrics/LyricsDocument.h
     lyrics/LyricsLoader.cpp lyrics/LyricsLoader.h
@@ -34,6 +35,6 @@ target_include_directories(lovelyrics_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/generated)
 target_link_libraries(lovelyrics_core PUBLIC
-    Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::DBus Qt6::Concurrent
+    Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::DBus Qt6::Concurrent Qt6::Network
     TagLib::tag ICU::uc)
 target_compile_options(lovelyrics_core PRIVATE -Wall -Wextra)

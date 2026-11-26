@@ -13,6 +13,9 @@ class Settings : public QObject
     Q_PROPERTY(QString fileName READ fileName CONSTANT)
     Q_PROPERTY(QString playerName READ playerName WRITE setPlayerName NOTIFY playerNameChanged)
     Q_PROPERTY(QStringList lyricSourceOrder READ lyricSourceOrder WRITE setLyricSourceOrder NOTIFY lyricSourceOrderChanged)
+    // LRCLIB lookups (opt-in) and whether downloads are also saved as .lrc next to the song.
+    Q_PROPERTY(bool onlineLyrics READ onlineLyrics WRITE setOnlineLyrics NOTIFY onlineLyricsChanged)
+    Q_PROPERTY(bool saveOnlineLyrics READ saveOnlineLyrics WRITE setSaveOnlineLyrics NOTIFY saveOnlineLyricsChanged)
     Q_PROPERTY(int globalOffsetMs READ globalOffsetMs WRITE setGlobalOffsetMs NOTIFY globalOffsetMsChanged)
     Q_PROPERTY(QString style READ style WRITE setStyle NOTIFY styleChanged)
     Q_PROPERTY(bool showTranslation READ showTranslation WRITE setShowTranslation NOTIFY showTranslationChanged)
@@ -21,6 +24,7 @@ class Settings : public QObject
     Q_PROPERTY(int fontWeight READ fontWeight WRITE setFontWeight NOTIFY fontWeightChanged)
     Q_PROPERTY(double fontScale READ fontScale WRITE setFontScale NOTIFY fontScaleChanged)
     Q_PROPERTY(QString backgroundMode READ backgroundMode WRITE setBackgroundMode NOTIFY backgroundModeChanged)
+    Q_PROPERTY(double backgroundPulse READ backgroundPulse WRITE setBackgroundPulse NOTIFY backgroundPulseChanged)
     Q_PROPERTY(int fpsCap READ fpsCap WRITE setFpsCap NOTIFY fpsCapChanged)
     Q_PROPERTY(bool karaokeFill READ karaokeFill WRITE setKaraokeFill NOTIFY karaokeFillChanged)
     Q_PROPERTY(QRect windowGeometry READ windowGeometry WRITE setWindowGeometry NOTIFY windowGeometryChanged)
@@ -44,6 +48,10 @@ public:
     void setPlayerName(const QString &v);
     QStringList lyricSourceOrder() const;
     void setLyricSourceOrder(const QStringList &v);
+    bool onlineLyrics() const;
+    void setOnlineLyrics(bool v);
+    bool saveOnlineLyrics() const;
+    void setSaveOnlineLyrics(bool v);
     int globalOffsetMs() const;
     void setGlobalOffsetMs(int v);
     QString style() const;
@@ -60,6 +68,8 @@ public:
     void setFontScale(double v);
     QString backgroundMode() const;
     void setBackgroundMode(const QString &v);
+    double backgroundPulse() const;
+    void setBackgroundPulse(double v);
     int fpsCap() const;
     void setFpsCap(int v);
     bool karaokeFill() const;
@@ -91,6 +101,8 @@ signals:
     void playerNameChanged();
     void lyricSourceOrderChanged();
     void globalOffsetMsChanged();
+    void onlineLyricsChanged();
+    void saveOnlineLyricsChanged();
     void styleChanged();
     void showTranslationChanged();
     void showCoverInfoChanged();
@@ -99,6 +111,7 @@ signals:
     void fontScaleChanged();
     void backgroundModeChanged();
     void fpsCapChanged();
+    void backgroundPulseChanged();
     void karaokeFillChanged();
     void windowGeometryChanged();
     void windowScreenChanged();

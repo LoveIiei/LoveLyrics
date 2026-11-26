@@ -13,6 +13,8 @@ class LyricsCursor;
 class CoverLoader;
 class Palette;
 class CardController;
+class LrclibClient;
+struct LyricsDocument;
 struct TrackInfo;
 
 // Owns the backend objects and connects them:
@@ -56,6 +58,8 @@ public:
     Q_INVOKABLE void adjustTrackOffset(int deltaMs);
     Q_INVOKABLE void resetTrackOffset();
     Q_INVOKABLE QString formatTime(double ms) const;
+    // A new file name for a screenshot in ~/Pictures/Love Lyrics/ (the folder is created).
+    Q_INVOKABLE QString screenshotPath() const;
 
 signals:
     void trackChanged();
@@ -63,6 +67,7 @@ signals:
 private:
     void onTrackChanged(const TrackInfo &track);
     void loadTrackMedia();
+    void onLyricsLoaded(const LyricsDocument &doc);
 
     Settings *m_settings;
     MprisClient *m_player;
@@ -73,6 +78,8 @@ private:
     Palette *m_palette;
     CoverLoader *m_cover;
     CardController *m_cards;
+    LrclibClient *m_lrclib;
+    quint64 m_onlineRequest = 0;
 
     bool m_viewActive = true;
     bool m_mediaPending = false; // track changed while inactive

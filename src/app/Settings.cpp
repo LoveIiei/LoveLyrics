@@ -33,6 +33,11 @@ QStringList Settings::lyricSourceOrder() const
 }
 void Settings::setLyricSourceOrder(const QStringList &v) { set("lyrics/sourceOrder", v, &Settings::lyricSourceOrderChanged); }
 
+bool Settings::onlineLyrics() const { return get<bool>("lyrics/online", false); }
+void Settings::setOnlineLyrics(bool v) { set("lyrics/online", v, &Settings::onlineLyricsChanged); }
+bool Settings::saveOnlineLyrics() const { return get<bool>("lyrics/saveOnline", false); }
+void Settings::setSaveOnlineLyrics(bool v) { set("lyrics/saveOnline", v, &Settings::saveOnlineLyricsChanged); }
+
 int Settings::globalOffsetMs() const { return get<int>("lyrics/globalOffsetMs", 0); }
 void Settings::setGlobalOffsetMs(int v) { set("lyrics/globalOffsetMs", v, &Settings::globalOffsetMsChanged); }
 
@@ -56,6 +61,9 @@ void Settings::setFontScale(double v) { set("font/scale", v, &Settings::fontScal
 
 QString Settings::backgroundMode() const { return get<QString>("view/background", QStringLiteral("cover")); }
 void Settings::setBackgroundMode(const QString &v) { set("view/background", v, &Settings::backgroundModeChanged); }
+
+double Settings::backgroundPulse() const { return get<double>("view/backgroundPulse", 0.5); }
+void Settings::setBackgroundPulse(double v) { set("view/backgroundPulse", v, &Settings::backgroundPulseChanged); }
 
 int Settings::fpsCap() const { return get<int>("view/fpsCap", 0); }
 void Settings::setFpsCap(int v) { set("view/fpsCap", v, &Settings::fpsCapChanged); }

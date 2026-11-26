@@ -18,6 +18,7 @@ lovelyrics_add_test(tst_media)
 lovelyrics_add_test(tst_settings)
 lovelyrics_add_test(tst_cards)
 lovelyrics_add_test(tst_structure)
+lovelyrics_add_test(tst_lrclib)
 
 # Integration: fake MPRIS player on a private session bus.
 lovelyrics_add_test(tst_mpris)

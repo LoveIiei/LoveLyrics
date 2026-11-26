@@ -37,6 +37,12 @@ For each track (in this order, configurable):
 2. Tags embedded in the file: `LYRICS` / `UNSYNCEDLYRICS` (FLAC, Ogg), ID3v2 `SYLT`
    then `USLT` (MP3), `©lyr` (MP4).
 3. `xesam:asText` from MPRIS, if the player sends it.
+4. Lyrics downloaded earlier from LRCLIB (`~/.cache/lovelyrics/lyrics/`).
+
+Optional, off by default: **Settings → Lyrics → Look up lyrics online (LRCLIB)**. When
+a song has no synced lyrics, its artist, title, album and length are sent to
+[lrclib.net](https://lrclib.net) (a free, open lyrics database); results are cached so
+each song is asked for once, and can also be saved as `.lrc` next to the song.
 
 Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS.
 
@@ -53,6 +59,7 @@ Text files may be UTF‑8, UTF‑16 (with BOM), GB18030/GBK, Big5 or Shift‑JIS
 | `S` | next style |
 | `,` | settings (`Esc` closes) |
 | `E` | make a lyric card |
+| `P` | save a screenshot to `~/Pictures/Love Lyrics/` |
 | `D` | debug page |
 
 Click a lyric line to jump to it. Moving the mouse shows the controls; they and the
