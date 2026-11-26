@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #include "LyricsModel.h"
 
+#include "SongStructure.h"
+
 LyricsModel::LyricsModel(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -26,6 +28,9 @@ QVariant LyricsModel::data(const QModelIndex &index, int role) const
     case WordsRole: return m_wordsCache.at(index.row());
     case IsInstrumentalRole: return line.isInstrumental;
     case WordsEstimatedRole: return line.wordsEstimated;
+    case IsChorusRole: return line.isChorus;
+    case SectionRole: return line.section;
+    case SectionKindRole: return line.sectionKind;
     }
     return {};
 }
@@ -41,6 +46,9 @@ QHash<int, QByteArray> LyricsModel::roleNames() const
         {WordsRole, "words"},
         {IsInstrumentalRole, "isInstrumental"},
         {WordsEstimatedRole, "wordsEstimated"},
+        {IsChorusRole, "isChorus"},
+        {SectionRole, "section"},
+        {SectionKindRole, "sectionKind"},
     };
 }
 
@@ -89,5 +97,26 @@ QVariantMap LyricsModel::get(int row) const
         {"words", m_wordsCache.at(row)},
         {"isInstrumental", line.isInstrumental},
         {"wordsEstimated", line.wordsEstimated},
+        {"isChorus", line.isChorus},
+        {"section", line.section},
+        {"sectionKind", line.sectionKind},
     };
+}
+
+QVariantList LyricsModel::units(int row) const
+{
+    QVariantList out;
+    if (row < 0 || row >= count())
+        return out;
+    for (const auto &u : SongStructure::units(m_doc.lines.at(row)))
+        out.append(QVariantMap{{"text", u.text}, {"startMs", u.startMs}, {"endMs", u.endMs}, {"spaceAfter", u.spaceAfter}});
+    return out;
+}
+
+QVariantMap LyricsModel::section(int index) const
+{
+    if (index < 0 || index >= m_doc.sections.size())
+        return {};
+    const auto &s = m_doc.sections.at(index);
+    return {{"firstLine", s.firstLine}, {"lastLine", s.lastLine}, {"startMs", s.startMs}, {"endMs", s.endMs}, {"kind", s.kind}};
 }

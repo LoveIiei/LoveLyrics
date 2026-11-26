@@ -35,6 +35,16 @@ var styles = [
         ],
     },
     {
+        name: "Partita",
+        file: "Partita/Style.qml",
+        description: "云阶 — rows step left and right, words spring in on their beat (after Folia)",
+        tunables: [
+            { key: "stagger", label: "Step width", min: 0, max: 180, step: 5, value: 100 },
+            { key: "motion", label: "Motion (calm – chaotic)", min: 0, max: 2, step: 0.1, value: 1.0 },
+            { key: "guides", type: "bool", label: "Guide lines", value: true },
+        ],
+    },
+    {
         name: "Still",
         file: "Still/Style.qml",
         description: "Calm, readable column (used for unsynced lyrics)",

@@ -19,6 +19,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Qml QuickControls2 DBus Concurrent ShaderTools)
 find_package(TagLib 2 REQUIRED CONFIG)
+# ICU (already required by qt6-base): dictionary word breaking for Chinese / Japanese.
+find_package(ICU REQUIRED COMPONENTS uc)
 
 qt_standard_project_setup(REQUIRES 6.8)
 qt_policy(SET QTP0004 NEW)
@@ -55,6 +57,8 @@ qt_add_qml_module(${APP_ID}
         qml/styles/Kinetic/Style.qml
         qml/styles/Stage/Style.qml
         qml/styles/Still/Style.qml
+        qml/styles/Partita/Style.qml
+        qml/styles/Partita/partita.js
     RESOURCES
         qml/icons/play.svg
         qml/icons/pause.svg

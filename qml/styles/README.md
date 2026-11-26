@@ -5,7 +5,7 @@ Each style is one QML file, `qml/styles/<Name>/Style.qml`, listed in `registry.j
 
 | Property          | Type          | What it is                                                    |
 |-------------------|---------------|---------------------------------------------------------------|
-| `lines`           | `LyricsModel` | rows: `startMs endMs text translation romanization words isInstrumental wordsEstimated`; also `synced`, `hasWordTiming`, `get(i)` |
+| `lines`           | `LyricsModel` | rows: `startMs endMs text translation romanization words isInstrumental wordsEstimated isChorus section sectionKind`; also `synced`, `hasWordTiming`, `get(i)`, `units(i)` (display units: words, CJK dictionary words), `section(i)`, `sectionCount`, `seed` (stable per song) |
 | `cursor`          | `LyricsCursor`| `activeIndex`, `focusIndex`, `nextIndex`, `progress`, `timeToNextMs` |
 | `positionMs`      | `real`        | lyrics position (user offsets applied), updated once per frame |
 | `theme`           | `Theme`       | animated palette (`dark text accent vibrant muted light dominant`) and font settings (`fontFamily fontWeight fontScale`) |
@@ -17,6 +17,14 @@ Each style is one QML file, `qml/styles/<Name>/Style.qml`, listed in `registry.j
 
 The plan called the theme property `palette`; it is `theme` because every Qt Quick
 `Item` already has a `palette` property.
+
+Song structure (`src/lyrics/SongStructure.cpp`, after Folia): `isChorus` marks the most
+repeated line text; sections split at long gaps and are classified `chorus`, `verse`,
+`lift`, `breath`, `break` (instrumental) or `outro`. PV styles pick their shots per
+section, seeded with `seed`, so a song looks the same on every play.
+
+Prefer motion that is a pure function of `positionMs` (see Partita's `spring()`): seeking
+and pausing then always show the right frame.
 
 Rules of thumb:
 

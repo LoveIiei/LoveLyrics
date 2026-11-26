@@ -2,6 +2,7 @@
 #include "LyricsLoader.h"
 
 #include "LrcParser.h"
+#include "SongStructure.h"
 #include "TextDecoding.h"
 #include "media/TagReader.h"
 #include "media/TrackResolver.h"
@@ -23,6 +24,7 @@ constexpr qint64 MaxLyricFileBytes = 2 * 1024 * 1024;
 LyricsDocument parseWithSource(const QString &text, const QString &source, const QString &path)
 {
     LyricsDocument doc = LrcParser::parse(text);
+    SongStructure::analyze(doc);
     doc.source = source;
     doc.sourcePath = path;
     return doc;

@@ -20,6 +20,9 @@ class LyricsModel : public QAbstractListModel
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     // Bumped on every document change, so views can restart transitions.
     Q_PROPERTY(int revision READ revision NOTIFY documentChanged)
+    // Stable per song: styles seed their random choices with it.
+    Q_PROPERTY(int seed READ seed NOTIFY documentChanged)
+    Q_PROPERTY(int sectionCount READ sectionCount NOTIFY documentChanged)
 
 public:
     enum Role {
@@ -31,6 +34,9 @@ public:
         WordsRole,
         IsInstrumentalRole,
         WordsEstimatedRole,
+        IsChorusRole,
+        SectionRole,
+        SectionKindRole,
     };
     Q_ENUM(Role)
 
@@ -54,9 +60,15 @@ public:
     QString sourcePath() const { return m_doc.sourcePath; }
     bool loading() const { return m_loading; }
     int revision() const { return m_revision; }
+    int seed() const { return int(m_doc.seed & 0x7fffffff); }
+    int sectionCount() const { return int(m_doc.sections.size()); }
 
     // A line as a JS object: {startMs, endMs, text, translation, romanization, words, isInstrumental}.
     Q_INVOKABLE QVariantMap get(int row) const;
+    // Display units of a line: [{text, startMs, endMs, spaceAfter}] (SongStructure::units).
+    Q_INVOKABLE QVariantList units(int row) const;
+    // A section: {firstLine, lastLine, startMs, endMs, kind}.
+    Q_INVOKABLE QVariantMap section(int index) const;
 
 signals:
     void documentChanged();

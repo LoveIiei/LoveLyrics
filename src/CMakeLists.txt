@@ -19,6 +19,7 @@ add_library(lovelyrics_core STATIC
     lyrics/LyricsDocument.h
     lyrics/LyricsLoader.cpp lyrics/LyricsLoader.h
     lyrics/LyricsModel.cpp lyrics/LyricsModel.h
+    lyrics/SongStructure.cpp lyrics/SongStructure.h
     lyrics/TextDecoding.cpp lyrics/TextDecoding.h
     media/CoverLoader.cpp media/CoverLoader.h
     media/PaletteExtractor.cpp media/PaletteExtractor.h
@@ -32,5 +33,5 @@ target_include_directories(lovelyrics_core PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/generated)
 target_link_libraries(lovelyrics_core PUBLIC
     Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::DBus Qt6::Concurrent
-    TagLib::tag)
+    TagLib::tag ICU::uc)
 target_compile_options(lovelyrics_core PRIVATE -Wall -Wextra)
