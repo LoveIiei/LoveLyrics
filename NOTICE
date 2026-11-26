@@ -28,6 +28,15 @@ file in their header. In particular:
                                              line ending normalisation)
   - src/lyrics/LyricsCursor.cpp
       src/components/visualizer/runtime.ts  (active / upcoming line rules)
+  - src/lyrics/SongStructure.cpp
+      src/utils/chorusDetector.ts, src/components/visualizer/paragraphStructure.ts
+  - qml/styles/Partita/ (云阶)
+      src/components/visualizer/partita/ (row chunking, stagger, word springs)
+  - qml/styles/Hanabi/hanabi.js, qml/styles/Hanabi/Style.qml (花火)
+      src/components/visualizer/hanabi/text/animations.ts (glyph poses),
+      catalog.ts (shot families), color.ts (palette roles)
+  - src/fx/SparkField.cpp
+      src/components/visualizer/hanabi/mg/burstPlan.ts (closed-form firework model)
 
 Lyrics 4U / lyric-card-generator (spacedge/lyric-card-generator), AGPL-3.0
 https://github.com/spacedge/lyric-card-generator

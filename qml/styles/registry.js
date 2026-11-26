@@ -45,6 +45,18 @@ var styles = [
         ],
     },
     {
+        name: "Hanabi",
+        file: "Hanabi/Style.qml",
+        description: "花火 — Japanese lyric-PV: words on colour blocks, fireworks, a rising night sky (after Folia)",
+        tunables: [
+            { key: "sparks", label: "Fireworks", min: 0, max: 2, step: 0.1, value: 1.0 },
+            { key: "motion", label: "Word motion", min: 0, max: 2, step: 0.1, value: 1.0 },
+            { key: "spin", label: "Camera swing", min: 0, max: 2, step: 0.1, value: 1.0 },
+            { key: "coverColors", label: "Use cover colours", min: 0, max: 1, step: 0.05, value: 0.35 },
+            { key: "sky", label: "Night sky", min: 0, max: 1, step: 0.05, value: 0.8 },
+        ],
+    },
+    {
         name: "Still",
         file: "Still/Style.qml",
         description: "Calm, readable column (used for unsynced lyrics)",

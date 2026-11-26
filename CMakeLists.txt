@@ -59,6 +59,8 @@ qt_add_qml_module(${APP_ID}
         qml/styles/Still/Style.qml
         qml/styles/Partita/Style.qml
         qml/styles/Partita/partita.js
+        qml/styles/Hanabi/Style.qml
+        qml/styles/Hanabi/hanabi.js
     RESOURCES
         qml/icons/play.svg
         qml/icons/pause.svg
@@ -76,6 +78,14 @@ qt_add_shaders(${APP_ID} "lovelyrics_shaders"
     FILES
         shaders/grain.frag
         shaders/gradient.frag
+)
+# Scene-graph material shaders (SparkField) must be batchable.
+qt_add_shaders(${APP_ID} "lovelyrics_material_shaders"
+    BATCHABLE
+    PREFIX "/"
+    FILES
+        shaders/spark.vert
+        shaders/spark.frag
 )
 target_link_libraries(${APP_ID} PRIVATE lovelyrics_core Qt6::QuickControls2)
 target_compile_options(${APP_ID} PRIVATE -Wall -Wextra)

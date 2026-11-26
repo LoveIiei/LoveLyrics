@@ -3,6 +3,7 @@
 
 #include "Settings.h"
 #include "cards/CardController.h"
+#include "fx/SparkField.h"
 #include "lyrics/LyricsCursor.h"
 #include "lyrics/LyricsLoader.h"
 #include "lyrics/LyricsModel.h"
@@ -150,6 +151,7 @@ void AppController::registerWithQml(QQmlEngine *engine)
     qmlRegisterSingletonInstance(uri, 1, 0, "Cover", m_cover);
     qmlRegisterSingletonInstance(uri, 1, 0, "Palette", m_palette);
     qmlRegisterSingletonInstance(uri, 1, 0, "Cards", m_cards);
+    qmlRegisterType<SparkField>(uri, 1, 0, "SparkField");
     qmlRegisterUncreatableType<MprisClient>(uri, 1, 0, "MprisClient", QStringLiteral("Use the Player singleton"));
     engine->addImageProvider(QStringLiteral("cover"), new CoverImageProvider(m_cover));
     engine->addImageProvider(QStringLiteral("card"), new CardImageProvider(m_cards));
