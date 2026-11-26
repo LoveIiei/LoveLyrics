@@ -19,7 +19,7 @@ namespace {
 
 QImage readImageFile(const QString &path)
 {
-    if (path.isEmpty())
+    if (!TrackResolver::isRegularFile(path))
         return {};
     QImageReader reader(path);
     reader.setAutoTransform(true);
@@ -106,7 +106,7 @@ CoverLoader::Result CoverLoader::loadNow(const TrackInfo &track)
         if (!img.isNull())
             r.origin = QStringLiteral("mpris");
     }
-    if (img.isNull() && !audioPath.isEmpty() && QFile::exists(audioPath)) {
+    if (img.isNull() && TrackResolver::isRegularFile(audioPath)) {
         const QByteArray bytes = TagReader::readCover(audioPath);
         if (!bytes.isEmpty() && img.loadFromData(bytes))
             r.origin = QStringLiteral("embedded");

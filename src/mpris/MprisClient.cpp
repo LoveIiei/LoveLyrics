@@ -150,6 +150,7 @@ void MprisClient::unsubscribe()
 void MprisClient::attach()
 {
     qCInfo(lcMpris) << "Player appeared:" << m_service;
+    ++m_generation; // replies from a previous owner of the name are stale
     setConnected(true);
     fetchAll();
 }
@@ -191,9 +192,12 @@ void MprisClient::fetchAll()
         QDBusMessage msg = QDBusMessage::createMethodCall(m_service, MprisPath, PropsIface, QStringLiteral("GetAll"));
         msg << iface;
         auto *watcher = new QDBusPendingCallWatcher(m_bus.asyncCall(msg), this);
-        connect(watcher, &QDBusPendingCallWatcher::finished, this, [handler](QDBusPendingCallWatcher *w) {
+        const QString service = m_service;
+        connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, handler, service](QDBusPendingCallWatcher *w) {
             QDBusPendingReply<QVariantMap> reply = *w;
             w->deleteLater();
+            if (service != m_service || !m_connected)
+                return; // the player changed (or went away) meanwhile
             if (reply.isError()) {
                 qCWarning(lcMpris) << "GetAll failed:" << reply.error().message();
                 return;
@@ -244,13 +248,12 @@ void MprisClient::applyPlayerProperties(const QVariantMap &props)
         const TrackInfo t = parseMetadata(toMap(props.value(QStringLiteral("Metadata"))));
         if (!t.sameTrack(m_track)) {
             ++m_generation;
-            const bool artChanged = t.artUrl != m_track.artUrl;
             m_track = t;
             qCInfo(lcMpris) << "Track:" << t.artist() << "-" << t.title << t.url;
+            // trackChanged covers the art too: artUrlChanged is only for art that arrives
+            // later for the same track (otherwise every new track loaded its cover twice).
             emit trackChanged(m_track);
             emit metadataChanged();
-            if (artChanged)
-                emit artUrlChanged(m_track.artUrl);
             wantPosition = true;
         } else if (!(t == m_track)) {
             const bool artChanged = t.artUrl != m_track.artUrl;

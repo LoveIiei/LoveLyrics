@@ -55,7 +55,7 @@ LyricsDocument LyricsLoader::loadNow(const TrackInfo &track, const QStringList &
             if (lrc.isEmpty())
                 continue;
             QFile f(lrc);
-            if (f.size() > MaxLyricFileBytes || !f.open(QIODevice::ReadOnly))
+            if (!TrackResolver::isRegularFile(lrc) || f.size() > MaxLyricFileBytes || !f.open(QIODevice::ReadOnly))
                 continue;
             QString encoding;
             const QString text = TextDecoding::decode(f.readAll(), &encoding);
@@ -64,7 +64,7 @@ LyricsDocument LyricsLoader::loadNow(const TrackInfo &track, const QStringList &
             if (!doc.isEmpty())
                 return doc;
         } else if (source == u"embedded") {
-            if (path.isEmpty() || !QFile::exists(path))
+            if (!TrackResolver::isRegularFile(path))
                 continue;
             const QString text = TagReader::readLyrics(path);
             if (text.trimmed().isEmpty())
@@ -76,7 +76,7 @@ LyricsDocument LyricsLoader::loadNow(const TrackInfo &track, const QStringList &
             // Lyrics downloaded earlier from LRCLIB.
             const QString cached = LrclibClient::cachePath(track);
             QFile f(cached);
-            if (cached.isEmpty() || !f.open(QIODevice::ReadOnly))
+            if (!TrackResolver::isRegularFile(cached) || f.size() > MaxLyricFileBytes || !f.open(QIODevice::ReadOnly))
                 continue;
             LyricsDocument doc = parseWithSource(TextDecoding::decode(f.readAll()), QStringLiteral("lrclib"), cached);
             if (!doc.isEmpty())

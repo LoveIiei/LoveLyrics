@@ -19,6 +19,13 @@ QString localPath(const QString &url)
     return u.toLocalFile();
 }
 
+bool isRegularFile(const QString &path)
+{
+    if (path.isEmpty())
+        return false;
+    return QFileInfo(path).isFile(); // follows symlinks; false for FIFOs, sockets, devices
+}
+
 QString findSidecarLyrics(const QString &audioPath)
 {
     if (audioPath.isEmpty())

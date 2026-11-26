@@ -27,6 +27,10 @@ class TestBackground : public QObject
         env.insert(QStringLiteral("QT_LOGGING_RULES"), QStringLiteral("lovelyrics.*=true\nlovelyrics.clock=false"));
         env.insert(QStringLiteral("LOVELYRICS_CONFIG"), m_dir.filePath(QStringLiteral("test.conf")));
         env.insert(QStringLiteral("XDG_CONFIG_HOME"), m_dir.path());
+#if defined(__SANITIZE_ADDRESS__)
+        // Qt keeps a few KiB of process-lifetime globals; don't fail the exit code for them.
+        env.insert(QStringLiteral("LSAN_OPTIONS"), QStringLiteral("exitcode=0"));
+#endif
         return env;
     }
 
@@ -129,7 +133,11 @@ private slots:
         QVERIFY2(!log.contains("Creating window"), log.constData());
         const qint64 idleRss = rssKb(app.processId());
         qInfo("background mode RSS: %lld KiB", idleRss);
+#if defined(__SANITIZE_ADDRESS__)
+        QVERIFY(idleRss > 0); // AddressSanitizer's shadow memory inflates RSS
+#else
         QVERIFY(idleRss > 0 && idleRss < 80 * 1024);
+#endif
 
         // A second --background launch just exits.
         QCOMPARE(runOnce({QStringLiteral("--background")}, appEnv()), 0);

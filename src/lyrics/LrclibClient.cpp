@@ -22,6 +22,9 @@ Q_LOGGING_CATEGORY(lcLrclib, "lovelyrics.lrclib")
 namespace {
 
 constexpr int TimeoutMs = 10000;
+// Lyrics are a few KiB; a search answer at most a few hundred. Anything far larger is
+// not something to buffer in memory.
+constexpr qint64 MaxReplyBytes = 4 * 1024 * 1024;
 
 // The lyrics in an LRCLIB record: synced if it has them, else plain; "" for none.
 QString lyricsOf(const QJsonObject &o, bool *synced)
@@ -91,7 +94,14 @@ QNetworkReply *LrclibClient::request(const QString &path, const QList<std::pair<
                   QStringLiteral("%1/%2").arg(QString::fromLatin1(AppInfo::Name).remove(QLatin1Char(' ')),
                                               QString::fromLatin1(AppInfo::Version)));
     req.setTransferTimeout(TimeoutMs);
-    return m_net->get(req);
+    QNetworkReply *reply = m_net->get(req);
+    connect(reply, &QNetworkReply::downloadProgress, reply, [reply](qint64 received, qint64) {
+        if (received > MaxReplyBytes) {
+            qCWarning(lcLrclib) << "reply too large, aborting";
+            reply->abort();
+        }
+    });
+    return reply;
 }
 
 void LrclibClient::lookup(const TrackInfo &track, quint64 id)
@@ -162,7 +172,7 @@ void LrclibClient::search(const TrackInfo &track, quint64 id)
                 continue;
             double score = synced ? 10 : 0;
             const QString a = o.value(QStringLiteral("artistName")).toString().toLower();
-            if (!artist.isEmpty() && (a == artist || a.contains(artist) || artist.contains(a)))
+            if (!artist.isEmpty() && !a.isEmpty() && (a == artist || a.contains(artist) || artist.contains(a)))
                 score += 20;
             if (track.lengthMs > 0) {
                 const double diff = std::abs(o.value(QStringLiteral("duration")).toDouble() - track.lengthMs / 1000.0);

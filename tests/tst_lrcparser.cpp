@@ -140,7 +140,7 @@ private slots:
         const auto doc =
             LrcParser::parse(QStringLiteral("[00:12.00]<00:12.00>Hello <00:12.50>world<00:13.20>\n[00:20.00]next\n"));
         QVERIFY(doc.hasWordTiming);
-        const auto &l = sungLines(doc)[0];
+        const LyricLine l = sungLines(doc)[0]; // a copy: sungLines() returns a temporary
         QCOMPARE(l.text, u"Hello world");
         QVERIFY(!l.wordsEstimated);
         QCOMPARE(l.words.size(), 2);

@@ -450,6 +450,9 @@ void SparkField::setTime(double t)
     m_time = t;
     prune();
     emit timeChanged();
+    // Nothing on screen and nothing to draw: skip the scene-graph sync and the upload.
+    if (m_events.empty() && m_embers <= 0 && m_lastCount == 0)
+        return;
     update();
 }
 
@@ -590,8 +593,9 @@ QSGNode *SparkField::updatePaintNode(QSGNode *old, UpdatePaintNodeData *)
         node->setFlag(QSGNode::OwnsMaterial);
     }
 
-    std::vector<Vertex> verts;
-    verts.reserve(4096);
+    // Reused between frames (one render thread): no allocation per frame once warm.
+    static thread_local std::vector<Vertex> verts;
+    verts.clear();
     QuadWriter w{verts};
     const float t = float(m_time);
 

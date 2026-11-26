@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 #include "TagReader.h"
 
+#include "TrackResolver.h"
 #include "lyrics/LrcParser.h"
 
 #include <QFile>
@@ -97,6 +98,8 @@ namespace TagReader {
 
 QString readLyrics(const QString &path)
 {
+    if (!TrackResolver::isRegularFile(path))
+        return {};
     const QByteArray encoded = QFile::encodeName(path);
     TagLib::FileRef ref(encoded.constData(), false);
     if (ref.isNull())
@@ -136,6 +139,8 @@ QString readLyrics(const QString &path)
 
 QByteArray readCover(const QString &path)
 {
+    if (!TrackResolver::isRegularFile(path))
+        return {};
     const QByteArray encoded = QFile::encodeName(path);
     TagLib::FileRef ref(encoded.constData(), false);
     if (ref.isNull())

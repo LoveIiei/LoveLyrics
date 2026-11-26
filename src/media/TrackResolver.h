@@ -13,6 +13,9 @@ QString localPath(const QString &url);
 // then "Song.flac.lrc". "" if none. The audio file itself does not need to exist.
 QString findSidecarLyrics(const QString &audioPath);
 
+// True for an existing regular file (not a directory, FIFO, socket or device).
+bool isRegularFile(const QString &path);
+
 // cover.* / folder.* / front.* / albumart*.* next to the audio file, "" if none.
 QString findFolderCover(const QString &audioPath);
 
