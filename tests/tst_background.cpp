@@ -8,6 +8,7 @@
 #include "mpris/MprisClient.h"
 
 #include <QProcess>
+#include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QtTest>
 
@@ -81,8 +82,13 @@ private slots:
 
         QVERIFY(AutostartController::desktopFilePath().startsWith(m_dir.path()));
         QVERIFY(!autostart.startAtLogin());
+        QVERIFY(!autostart.resident());
+        QSignalSpy residentSpy(&autostart, &AutostartController::residentChanged);
         autostart.setStartAtLogin(true);
         QVERIFY(autostart.startAtLogin());
+        // Turning it on makes this run resident too: closing the window keeps listening.
+        QVERIFY(autostart.resident());
+        QCOMPARE(residentSpy.count(), 1);
         QFile f(AutostartController::desktopFilePath());
         QVERIFY(f.open(QIODevice::ReadOnly));
         const QString contents = QString::fromUtf8(f.readAll());
@@ -91,6 +97,7 @@ private slots:
         f.close();
         autostart.setStartAtLogin(false);
         QVERIFY(!QFile::exists(AutostartController::desktopFilePath()));
+        QVERIFY(!autostart.resident());
     }
 
     void residentLifecycle()

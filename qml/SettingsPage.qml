@@ -390,8 +390,8 @@ Item {
                     opacity: 0.55
                     font.pixelSize: 12
                     text: (Autostart.resident
-                           ? qsTr("Running in the background: closing the window keeps listening.")
-                           : qsTr("These apply when started in the background (at login, or lovelyrics --background)."))
+                           ? qsTr("Closing the window keeps Love Lyrics listening in the background; it comes back when playback starts. Quit with Ctrl+Q or the button below.")
+                           : qsTr("These apply while Love Lyrics runs in the background: turn on start at login, or run lovelyrics --background."))
                           + " " + qsTr("Full screen uses the monitor chosen under Display.")
                 }
                 Row2 {

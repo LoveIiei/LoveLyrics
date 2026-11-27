@@ -67,9 +67,6 @@ int main(int argc, char *argv[])
     qunsetenv("XDG_ACTIVATION_TOKEN"); // only valid for our own first window
 
     const bool resident = parser.isSet(backgroundOpt);
-    // Resident: closing the window only hides it; quit with Ctrl+Q, the settings panel
-    // or `lovelyrics --quit`.
-    QGuiApplication::setQuitOnLastWindowClosed(!resident);
 
     // LOVELYRICS_CONFIG=/path/file.conf uses another settings file (tests, dev runs).
     const QString configOverride = qEnvironmentVariable("LOVELYRICS_CONFIG");
@@ -94,6 +91,12 @@ int main(int argc, char *argv[])
     QObject::connect(&windows, &WindowManager::visibleChanged, &controller, &AppController::setViewActive);
     AutostartController autostart(controller.player(), &windows, &settings, resident);
     qmlRegisterSingletonInstance("LoveLyrics.Backend", 1, 0, "Autostart", &autostart);
+    // Resident (started with --background, or start at login is on): closing the window
+    // only hides it and the app keeps listening for playback. Quit with Ctrl+Q, the
+    // settings panel or `lovelyrics --quit`.
+    auto updateQuitOnClose = [&autostart] { QGuiApplication::setQuitOnLastWindowClosed(!autostart.resident()); };
+    updateQuitOnClose();
+    QObject::connect(&autostart, &AutostartController::residentChanged, &app, updateQuitOnClose);
 
     QObject::connect(&instance, &SingleInstance::activateRequested, &app,
                      [&windows](const QString &token) { windows.show(false, token); });

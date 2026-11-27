@@ -16,12 +16,12 @@
 Q_LOGGING_CATEGORY(lcAutostart, "lovelyrics.autostart")
 
 AutostartController::AutostartController(MprisClient *player, WindowManager *windows, Settings *settings,
-                                         bool resident, QObject *parent)
+                                         bool startedInBackground, QObject *parent)
     : QObject(parent)
     , m_player(player)
     , m_windows(windows)
     , m_settings(settings)
-    , m_resident(resident)
+    , m_startedInBackground(startedInBackground)
 {
     connect(m_player, &MprisClient::statusChanged, this, &AutostartController::onStatusChanged);
     connect(m_player, &MprisClient::connectedChanged, this, &AutostartController::onConnectedChanged);
@@ -37,7 +37,7 @@ void AutostartController::onStatusChanged(MprisClient::PlaybackStatus status)
         m_dismissed = false;
         return;
     }
-    if (status != MprisClient::Playing || !m_resident)
+    if (status != MprisClient::Playing || !resident())
         return;
     const QString mode = m_settings->autostartMode();
     if (mode == u"off" || m_windows->isVisible() || m_dismissed)
@@ -51,7 +51,7 @@ void AutostartController::onConnectedChanged(bool connected)
     if (connected)
         return;
     m_dismissed = false;
-    if (m_resident && m_settings->hideWhenPlayerQuits() && m_windows->isVisible()) {
+    if (resident() && m_settings->hideWhenPlayerQuits() && m_windows->isVisible()) {
         qCInfo(lcAutostart) << "Player quit: hiding the window";
         m_windows->hide();
     }
@@ -113,4 +113,5 @@ void AutostartController::setStartAtLogin(bool enabled)
         qCInfo(lcAutostart) << "Start at login disabled";
     }
     emit startAtLoginChanged();
+    emit residentChanged();
 }
