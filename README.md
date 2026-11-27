@@ -1,5 +1,9 @@
 # Love Lyrics
 
+*HEY*, if you like reading lyrics, then you should use this!
+
+![Hanabi style: lyrics with fireworks over a night sky](docs/screenshots/hanabi.jpg)
+
 A native Qt 6 / QML app for KDE Plasma (Wayland) that follows
 [Strawberry Music Player](https://www.strawberrymusicplayer.org/) over MPRIS and
 shows album art with time‑synced lyrics in immersive, animated full‑screen styles.
@@ -68,14 +72,36 @@ hides: when idle (default), when idle in full screen only, or never.
 
 ### Styles
 
-- **Flow** — scrolling lyrics; the active line is large and sharp, the others dim and
+`S` cycles through them; the settings panel picks one directly.
+
+- **Flow**: scrolling lyrics. The active line is large and sharp; the others dim and
   blur with distance, and the list moves like a wave.
-- **Kinetic** — one line at a time, very large, in a layout that changes per line; words
+- **Kinetic**: one line at a time, very large, in a layout that changes per line. Words
   arrive on their timestamps (estimated when the file has none).
-- **Stage** — large tilting cover (follows the mouse, drifts when idle) with a
-  reflection and progress line; previous / current / next line beside it.
-- **Still** — calm centred column. Used automatically for lyrics without timestamps;
+- **Stage**: a large tilting cover (it follows the mouse and drifts when idle) with a
+  reflection and progress line; the previous, current and next lines sit beside it.
+- **Still**: a calm centred column. Used automatically for lyrics without timestamps;
   scroll by hand to look around (auto-scroll resumes after 5 s).
+
+PV-like styles, after [Folia](https://github.com/chthollyphile/folia-major)'s themes:
+
+- **Partita (云阶)**: rows step left and right; words spring in on their beat.
+- **Hanabi (花火)**: a Japanese lyric-PV look, with words on colour blocks, fireworks and
+  a rising night sky.
+- **Pendolo (时计)**: the lyrics are spokes of a ticking clockwork wheel.
+- **Lumiere (绘光)**: stage lights through haze; words light up where the beams fall.
+
+| | |
+|:---:|:---:|
+| ![Flow](docs/screenshots/flow.jpg) | ![Kinetic](docs/screenshots/kinetic.jpg) |
+| **Flow** | **Kinetic** |
+| ![Stage](docs/screenshots/stage.jpg) | ![Hanabi](docs/screenshots/hanabi.jpg) |
+| **Stage** | **Hanabi (花火)** |
+| ![Pendolo](docs/screenshots/pendolo.jpg) | ![Lumiere](docs/screenshots/lumiere.jpg) |
+| **Pendolo (时计)** | **Lumiere (绘光)** |
+
+*The screenshots play 「嘘月」 and 「春泥棒」 by ヨルシカ (Yorushika), from the EP 創作. The
+lyrics and cover art belong to their owners and are shown here only to demonstrate the app.*
 
 Each style has its own tunables in the settings panel (gear button or `,`).
 
