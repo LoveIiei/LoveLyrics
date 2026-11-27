@@ -34,7 +34,6 @@ qt_add_executable(${APP_ID} src/main.cpp)
 qt_add_qml_module(${APP_ID}
     URI LoveLyrics
     VERSION 1.0
-    NO_RESOURCE_TARGET_PATH
     QML_FILES
         qml/Main.qml
         qml/DebugPage.qml

@@ -39,3 +39,13 @@ if(DBUS_RUN_SESSION)
     add_test(NAME tst_background_isolated COMMAND ${DBUS_RUN_SESSION} -- $<TARGET_FILE:tst_background>)
     set_tests_properties(tst_background_isolated PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" LABELS integration TIMEOUT 90)
 endif()
+
+# The binary must run from anywhere: everything (QML, shaders, icons) is compiled in.
+# Copies it to a temporary folder, away from the build tree, and starts it.
+if(DBUS_RUN_SESSION)
+    add_test(NAME app_relocated
+             COMMAND sh -c "d=$(mktemp -d) && cp \"$1\" \"$d/\" && cd \"$d\" && LOVELYRICS_CONFIG=\"$d/t.conf\" \"$2\" -- ./$3 --grab \"$d/g.png\" --grab-after 500; r=$?; rm -rf \"$d\"; exit $r"
+                     sh $<TARGET_FILE:${APP_ID}> ${DBUS_RUN_SESSION} $<TARGET_FILE_NAME:${APP_ID}>)
+    set_tests_properties(app_relocated PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_BACKEND=software" TIMEOUT 60)
+endif()
